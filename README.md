@@ -1,4 +1,4 @@
-<<<<<<< HEAD
+
 # GWNU Assignment PUSH Notice
 `Gangneung-Wonju National University Assignment PUSH NOTICE`   
 
@@ -24,7 +24,3 @@ WAS | ?                    |
 DB Server | ?              | 2022.03.25 ~ 27
 
 
-=======
-# GWNU_LMS_assignment
-GWNU Assignment PUSH notice
->>>>>>> 8cf39ecd3fb2c61f2343300cabef0d70501947cf
