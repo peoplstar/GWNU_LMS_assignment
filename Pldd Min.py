@@ -164,3 +164,4 @@ with open('./'+ userid +'.json', 'w', encoding = "UTF-8") as f :
 
 # 브라우저 종료
 browser.quit()
+# serializer.save()
