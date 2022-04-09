@@ -27,8 +27,8 @@ chrome_options.add_argument("--start-maximized")
 chrome_options.add_argument("--window-size=1920,1080")
 browser = webdriver.Chrome(service = Service(ChromeDriverManager().install()), options = chrome_options) # 추가
 
-#browser.maximize_window()
-#chrome_ver = chromedriver_autoinstaller.get_chrome_version().split('.')[0] #크롬드라이버 버전 확인
+# browser.maximize_window()
+# chrome_ver = chromedriver_autoinstaller.get_chrome_version().split('.')[0] #크롬드라이버 버전 확인
 
 # Chromedriver 경로 설정
 '''
@@ -55,8 +55,8 @@ browser.find_element(By.ID, "userId").send_keys(userid) # 추가
 #browser.find_element_by_id("password").send_keys(password)
 browser.find_element(By.ID, "password").send_keys(password) # 추가
 
-#로그인 완료A
-#browser.find_element_by_xpath("/html/body/div/div/div[1]/div/div/div[1]/a").click()
+# 로그인 완료
+# browser.find_element_by_xpath("/html/body/div/div/div[1]/div/div/div[1]/a").click()
 # browser.find_element(By.XPATH, "/html/body/div/div/div[1]/div/div/div[1]/a").click() # 추가
 WebDriverWait(browser, 10).until(EC.element_to_be_clickable((By.XPATH, "/html/body/div/div/div[1]/div/div/div[1]/a"))).click() # 추가
 
@@ -87,6 +87,13 @@ temp_dict = {}
 for i in subject_list :
     # frame 값 지정
     browser.switch_to.frame('main')
+    
+    # 팝업창 삭제
+    try :
+        WebDriverWait(browser, 10).until(EC.element_to_be_clickable((By.XPATH, "/html/body/div[4]/div[1]/button/span[1]"))).click() # 추가
+    except :
+        pass
+    
     # 리스트에 없는 과목 예외처리
     try :
         searching = browser.find_element(By.XPATH, i)
@@ -164,4 +171,3 @@ with open('./'+ userid +'.json', 'w', encoding = "UTF-8") as f :
 
 # 브라우저 종료
 browser.quit()
-# serializer.save()

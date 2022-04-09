@@ -73,8 +73,11 @@ for i in subject_list :
     browser.switch_to.frame('main')
 
     # 팝업창 삭제
-    WebDriverWait(browser, 10).until(EC.element_to_be_clickable((By.XPATH, "/html/body/div[4]/div[1]/button/span[1]"))).click() # 추가
-
+    try :
+        WebDriverWait(browser, 10).until(EC.element_to_be_clickable((By.XPATH, "/html/body/div[4]/div[1]/button/span[1]"))).click() # 추가
+    except :
+        pass
+    
     # 리스트에 없는 과목 예외처리
     try :
         searching = browser.find_element(By.XPATH, i)
@@ -113,11 +116,13 @@ for i in subject_list :
 
     # 제출기한 시작 저장
     for d_day_start in d_days:
-        d_day_start_result.append(d_day_start.get_text().replace("\t","").replace("\n","").replace("\xa0","").replace("과제 정보 리스트제출기간점수공개일자연장제출제출여부평가점수","")[slice1])
+        d_day_start_result.append(d_day_start.get_text().replace("\t","").replace("\n","").replace("\xa0","")
+                                  .replace("과제 정보 리스트제출기간점수공개일자연장제출제출여부평가점수","")[slice1])
     
     # 제출기한 끝 저장
     for d_day_end in d_days:
-        d_day_end_result.append(d_day_end.get_text().replace("\t","").replace("\n","").replace("\xa0","").replace("과제 정보 리스트제출기간점수공개일자연장제출제출여부평가점수","")[slice2])
+        d_day_end_result.append(d_day_end.get_text().replace("\t","").replace("\n","").replace("\xa0","")
+                                .replace("과제 정보 리스트제출기간점수공개일자연장제출제출여부평가점수","")[slice2])
         
     # 제출여부 저장
     for clear in d_days:
@@ -149,7 +154,8 @@ count = len(title_result)
 for j in range(count):
     dict_key.insert(j, 'tasks%d' %j)
     for i in range(len(dict_key)):
-        temp_dict[dict_key[i]] = {"course" : course_result[i], "title" : title_result[i], "d_day_start" : d_day_start_result[i], "d_day_end" : d_day_end_result[i], "clear" : clear_result[i], "content" : content_result[i]}
+        temp_dict[dict_key[i]] = {"course" : course_result[i], "title" : title_result[i], "d_day_start" : d_day_start_result[i],
+                                  "d_day_end" : d_day_end_result[i], "clear" : clear_result[i], "content" : content_result[i]}
 
 with open('./'+ userid +'.json', 'w', encoding = "UTF-8") as f :
     json.dump(temp_dict, f, ensure_ascii = False, default = str, indent = 4)
