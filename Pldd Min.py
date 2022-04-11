@@ -10,9 +10,8 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import NoSuchElementException # 예외지정
 from selenium.webdriver.chrome.service import Service # 추가
-from bs4 import BeautifulSoup as bs
-from selenium.webdriver.support.ui import WebDriverWait # 추가
 from webdriver_manager.chrome import ChromeDriverManager # 추가
+from bs4 import BeautifulSoup as bs
 
 import chromedriver_autoinstaller
 import time
