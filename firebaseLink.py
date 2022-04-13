@@ -12,6 +12,6 @@ cred = credentials.Certificate("lms-assignment-firebase-adminsdk-gg9hv-0e2b022f8
 firebase_admin.initialize_app(cred, {
     'databaseURL' : db_url
 })
-
-ref = db.reference('')
+# 학번이 있는지 확인, 이후 db.reference('학번') 으로 JSON Response
+ref = db.reference('20171473')
 print(ref.get())
