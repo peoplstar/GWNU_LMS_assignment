@@ -4,12 +4,13 @@ from rest_framework.response import Response
 from rest_framework import status
 from .serializers import lmsItemSerializer
 from .models import lmsItem
+import Pldd
 import json
-#from .models import assignment
+# from .models import assignment
 # Create your views here.
 
 class lmsItemViews(APIView):
-    def get(self, request, lms_id):
+    #def get(self, request, lms_id):
         
 
 
@@ -17,14 +18,14 @@ class lmsItemViews(APIView):
     def post(self, request):
         serializer = lmsItemSerializer(data = request.data)
         if serializer.is_valid():
-           # serializer.save()
+            # serializer.save()
             inform = request.data
             dump = json.dumps(inform)
             tmp = json.loads(dump)
-            id = tmp['lms_id']
-            pw = tmp['lms_pw']
-            print(id)
-            print(pw)
+            userid = tmp['lms_id']
+            password = tmp['lms_pw']
+            # Crawling Method Parameter 
+            Pldd.crawling(userid, password)
 
             return Response("Login Success")
         #({"status" : "success", "data" : serializer.data}, status = status.HTTP_200_OK)
