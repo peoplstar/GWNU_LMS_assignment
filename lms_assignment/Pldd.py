@@ -17,6 +17,7 @@ import time
 import bs4
 import json
 import re
+import firebaseLink
 
 # Parameter 전송을 위한 Class 선언
 class crawling:    
@@ -25,7 +26,7 @@ class crawling:
         self.userid = userid
         self.password = password
         
-    
+    def craw(self):
         chrome_options = webdriver.ChromeOptions()
 
         # 브라우저 창 없이 실행
@@ -35,7 +36,7 @@ class crawling:
 
         # Chromedriver 경로 설정
         browser = webdriver.Chrome(service = Service(ChromeDriverManager().install()), options = chrome_options) # 추가
-
+    
         # url 이동
         browser.get("https://portal.gwnu.ac.kr/user/login.face?ssoReturn=https://lms.gwnu.ac.kr")
         
@@ -162,7 +163,7 @@ class crawling:
                              "d_day_end" : d_day_end_result[i], "clear" : clear_result[i], "content" : content_result[i]}
             a_dict.append(temp_dict)
 
-        b_dict = {self.userid: a_dict}
+        b_dict = {"task": a_dict} # key 값 변경
 
         # JSON 파일 경로 변경
         with open('./assignmentJson/'+ self.userid +'.json', 'w', encoding = "UTF-8") as f : 
@@ -170,3 +171,4 @@ class crawling:
 
         # 브라우저 종료
         browser.quit()
+        return b_dict
