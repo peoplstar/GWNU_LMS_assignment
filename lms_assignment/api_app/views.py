@@ -25,8 +25,8 @@ class lmsItemViews(APIView):
             userid = tmp['lms_id']
             password = tmp['lms_pw']
             # Crawling Method Parameter 
-            Pldd.crawling(userid, password)
-
+            crawSystem = Pldd.crawling(userid, password)
+            crawSystem.craw()
             return Response("Login Success")
         #({"status" : "success", "data" : serializer.data}, status = status.HTTP_200_OK)
         else:
