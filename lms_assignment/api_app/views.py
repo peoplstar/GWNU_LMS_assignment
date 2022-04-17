@@ -6,6 +6,7 @@ from .serializers import lmsItemSerializer
 from .models import lmsItem
 import Pldd
 import json
+import firebaseLink
 # from .models import assignment
 # Create your views here.
 
@@ -24,10 +25,17 @@ class lmsItemViews(APIView):
             tmp = json.loads(dump)
             userid = tmp['lms_id']
             password = tmp['lms_pw']
+            
             # Crawling Method Parameter 
             crawSystem = Pldd.crawling(userid, password)
-            crawSystem.craw()
-            return Response("Login Success")
+            txt = crawSystem.craw()
+            
+            # JSON DB data processing
+            firedb = firebaseLink.DBLink(userid)
+            firedb.rwJson("")
+            firedb.Link("")
+
+            return Response(txt)
         #({"status" : "success", "data" : serializer.data}, status = status.HTTP_200_OK)
         else:
             return Response("Login Failed")
