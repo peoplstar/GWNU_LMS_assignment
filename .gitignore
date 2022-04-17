@@ -6,9 +6,6 @@ __pycache__/
 # C extensions
 *.so
 
-# FirebaseLink API KEY before hiding
-firebaseLink.py
-
 # Distribution / packaging
 .Python
 build/
