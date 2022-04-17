@@ -36,8 +36,13 @@
             password = tmp['lms_pw']
             # Crawling Method Parameter 
             crawSystem = Pldd.crawling(userid, password)
-            crawSystem.craw()
-            return Response("Login Success")
+            txt = crawSystem.craw()
+
+            # JSON DB data processing
+            firedb = firebaseLink.DBLink(userid)
+            firedb.rwJson()
+            firedb.Link()
+            return Response(txt)
         #({"status" : "success", "data" : serializer.data}, status = status.HTTP_200_OK)
         else:
             return Response("Login Failed")
@@ -46,9 +51,9 @@
 * ID와 PW는 평문으로 API Server에 저장된다면 보안상 매우 취약하게 되므로, `serializer.save()`를 주석 처리하여 저장되지 않게 명시한다. 
 
   * ##### *추후 https를 이용해 보완*   
+
+* FireBase와 연동을 위해 `firebaseLink`를 import 하고, 파싱된 userid를 매개변수로 넘겨 DB에 Assignmnet data를 저장한다.
    
 * 모바일과의 통신으로부터 얻은 ID와 PW를 python 객체로 얻기 위해 `dumps`와 `loads`를 동시에 사용한다.
 
 * JSON은 **{key : value}** 로 이루어져 있는 파일의 형태이기 때문에 key로 접근이 가능하다.
-
-* 
