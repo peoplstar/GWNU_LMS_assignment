@@ -1,0 +1,35 @@
+# pip install firebase_admin
+
+import json
+import firebase_admin
+from firebase_admin import credentials
+from firebase_admin import firestore
+from firebase_admin import db
+
+# Firebase database 인증 및 앱 초기화
+
+data = {}
+
+class DBLink:
+    def __init__(self, userid):
+        # 로그인
+        self.userid = userid
+   
+    def rwJson(self):
+        # 윈도우 경로 : r'lms_assignment/'
+        # 리눅스 경로 : './assignmentJson/' 
+        with open('./assignmentJson/' + self.userid + '.json', 'r+', encoding = "UTF-8") as f: 
+            tmp = json.load(f)
+            data[self.userid] = tmp
+    
+    def Link(self):
+        db_url = 'https://lms-assignment-default-rtdb.firebaseio.com/'
+
+        cred = credentials.Certificate("KEYNAME.json")
+        firebase_admin.initialize_app(cred, {
+            'databaseURL' : db_url
+        })
+        
+        # 학번이 있는지 확인, 이후 db.reference('학번') 으로 JSON Response
+        ref = db.reference('')
+        ref.update({self.userid : data[self.userid]})
