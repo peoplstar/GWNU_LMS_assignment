@@ -17,7 +17,6 @@ import time
 import bs4
 import json
 import re
-import firebaseLink
 
 # Parameter 전송을 위한 Class 선언
 class crawling:    
