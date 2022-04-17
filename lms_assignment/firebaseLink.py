@@ -25,12 +25,12 @@ class DBLink:
     def Link(self):
         db_url = 'https://lms-assignment-default-rtdb.firebaseio.com/'
 
-        cred = credentials.Certificate("KEYNAME.json")
-        firebase_admin.initialize_app(cred, {
-            'databaseURL' : db_url
-        })
-        
+        if not firebase_admin._apps:
+            cred = credentials.Certificate("./lms-assignment-firebase-adminsdk-gg9hv-0e2b022f8b.json")
+            firebase_admin.initialize_app(cred, {
+                'databaseURL' : db_url
+            })
+
         # 학번이 있는지 확인, 이후 db.reference('학번') 으로 JSON Response
         ref = db.reference('')
         ref.update({self.userid : data[self.userid]})
-        
