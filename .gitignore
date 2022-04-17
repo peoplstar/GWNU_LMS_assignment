@@ -6,6 +6,10 @@ __pycache__/
 # C extensions
 *.so
 
+# firebase test python file
+
+firebaseWindow.py
+
 # Distribution / packaging
 .Python
 build/
