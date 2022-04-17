@@ -33,3 +33,4 @@ class DBLink:
         # 학번이 있는지 확인, 이후 db.reference('학번') 으로 JSON Response
         ref = db.reference('')
         ref.update({self.userid : data[self.userid]})
+        
