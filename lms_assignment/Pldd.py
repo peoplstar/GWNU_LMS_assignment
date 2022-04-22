@@ -40,9 +40,11 @@ class crawling:
         browser.get("https://portal.gwnu.ac.kr/user/login.face?ssoReturn=https://lms.gwnu.ac.kr")
         
         # id, pw 입력
+        
         browser.find_element(By.ID, "userId").send_keys(self.userid) # 추가
         browser.find_element(By.ID, "password").send_keys(self.password) # 추가
 
+        
         # 로그인 완료
         # browser.find_element_by_xpath("/html/body/div/div/div[1]/div/div/div[1]/a").click()
         # browser.find_element(By.XPATH, "/html/body/div/div/div[1]/div/div/div[1]/a").click() # 추가
