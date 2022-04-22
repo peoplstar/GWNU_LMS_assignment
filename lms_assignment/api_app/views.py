@@ -13,8 +13,10 @@ import firebaseLink
 # Create your views here.
 
 class lmsItemViews(APIView):
-    #def get(self, request, lms_id):
-        
+    '''
+    def get(self, request, lms_id):
+        return(RSA 공개키를 전달)
+    '''
 
 
 
