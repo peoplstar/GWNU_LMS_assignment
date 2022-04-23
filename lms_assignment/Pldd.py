@@ -69,7 +69,8 @@ class crawling:
         d_end_result = []
         course_result = []
         clear_result = []
-
+        progress_result = []
+        
         # json 리스트 선언
         dict_key = []
         temp_dict = {}
@@ -115,6 +116,8 @@ class crawling:
             contents = bs.find_all('div','cont pb0')
             # 과목이름 크롤링
             course = bs.find('h1','f40')
+            # 과제진행여부 크롤링 추가
+            progresses = bs.find_all('span','f12')
 
             # 과제제목 저장, 과목이름 저장
             for title in titles:
@@ -143,6 +146,17 @@ class crawling:
             for content in contents:
                 content_result.append(content.get_text().replace("\t","").replace("\n","").replace("\xa0",""))
 
+            # 과제진행여부 저장 추가
+            for progress in progresses:
+                progress_result.append(progress.get_text().replace("\t","").replace("\n","").replace("\xa0",""))
+
+            def getprogress(ch):
+                if ch == "[진행중]" or ch == "[마감]" or ch == "[진행예정]":
+                    return True
+                else:
+                    return None
+
+            progress_result = list(filter(getprogress, progress_result)) 
 
             #Num_C = len(title_result)
             #Num = []
@@ -159,10 +173,12 @@ class crawling:
         b_dict = {}
         for j in range(count):
             dict_key.insert(j, 'tasks%d' %j)
-            for i in range(len(dict_key)):
-                temp_dict = {"course" : course_result[i], "title" : title_result[i], "d_day_start" : d_day_start_result[i],
-                             "d_day_end" : d_day_end_result[i], "clear" : clear_result[i], "content" : content_result[i]}
-            a_dict.append(temp_dict)
+            if progress_result[j] == "[진행중]" or progress_result[j] == "[진행예정]":
+                for i in range(len(dict_key)):
+                    temp_dict = {"course" : course_result[i], "title" : title_result[i], "d_day_start" : d_day_start_result[i], "d_day_end" : d_day_end_result[i], "clear" : clear_result[i], "content" : content_result[i]}
+                a_dict.append(temp_dict)
+            else:
+                pass
 
         b_dict = {"task": a_dict} # key 값 변경
 
