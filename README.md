@@ -22,6 +22,30 @@
   최민규, 윤한을 | Server   | 
   김종원, 신현준 | Crawling |
 
+
+> ### Django 서버 구축
+
+`pip install django` : django 패키지 설치
+
+`pip install djangorestframework` : REST API를 위한 REST Framework 설치
+
+`django-admin startproject [projectname]` : django 프로젝트 생성
+
+`python3 manage.py start app [appname]` : django app 생성
+
+* 필자는 `api_app`으로 생성했습니다.
+
+> ### Settings.py 설정
+Settings.py의 경로는 `[projectname]/[projectname]/settings.py` 에서 확인 가능하다.
+
+
+<img src=https://user-images.githubusercontent.com/78135526/164878910-929d5d98-77d2-453b-9ced-e0ce22ca4cf1.png width = '250' height = '250'>
+
+
+Default는 `ALLOWED_HOSTS = []`로 되어 있다. 이렇게 되면 외부에서 접근이 불가능하다. 해당 서버에 모두가 접근 할 수 있게 위와 같이 **'*'** 로 설정하고, 추후 AWS 인바운드 정책 및 iptables로 보안을 설정 할 것이다.
+
+INSTALLED_APPS는 REST API를 사용하기 위해 `rest_framework` 명시, 우리가 사용할 앱 `api_app`을 명시해준다.
+
 > ### Views.py 파일 수정
 
 ```python
