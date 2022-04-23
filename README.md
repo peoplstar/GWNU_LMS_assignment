@@ -19,7 +19,7 @@
   작업자   | 역할        |
   :-----: | :----------:|
   김중원        | Kotlin       | 
-  최민규, 윤한을 | Server   | 
+  최민규, 윤한을 | Server, DB   | 
   김종원, 신현준 | Crawling |
 
 
@@ -34,6 +34,22 @@
 `python3 manage.py start app [appname]` : django app 생성
 
 * 필자는 `api_app`으로 생성했습니다.
+
+> ### models.py 설정
+
+```python
+from django.db import models
+
+# Create your models here.
+class lmsItem(models.Model):
+    lms_id = models.CharField(max_length = 15, primary_key = True)
+    lms_pw = models.CharField(max_length = 30)
+    # FirebaseToken = models.CharField(max_length = )
+```
+
+* 우리는 학교 로그인 정보를 받아서 크롤링을 진행할 것이기에 필요한 API로 받을 정보는 ID와 PW이기에 위와 같은 설정을 하고, 기본 키가 되는 것은 ID 이기에 `primary_key = True`로 설정했다.
+
+* 이후, Firebase FCM PUSH를 위한 FirebaseToken을 받아야 하므로 주석으로 처리했다.
 
 > ### Settings.py 설정
 Settings.py의 경로는 `[projectname]/[projectname]/settings.py` 에서 확인 가능하다.
@@ -81,3 +97,64 @@ INSTALLED_APPS는 REST API를 사용하기 위해 `rest_framework` 명시, 우�
 * 모바일과의 통신으로부터 얻은 ID와 PW를 python 객체로 얻기 위해 `dumps`와 `loads`를 동시에 사용한다.
 
 * JSON은 **{key : value}** 로 이루어져 있는 파일의 형태이기 때문에 key로 접근이 가능하다.
+
+> Crawling
+```python
+# Parameter 전송을 위한 Class 선언
+class crawling:    
+    def __init__(self, userid, password):
+        # 로그인
+        self.userid = userid
+        self.password = password
+        
+    def craw(self):
+        chrome_options = webdriver.ChromeOptions()
+
+        # 브라우저 창 없이 실행
+```
+* 별도의 클래스로 지정해주지 않아 `views.py`로 받은 ID와 PW를 넘기기 위해 위 처럼 수정을 해줬다.
+
+> FirebaseLink.py
+```python
+# pip install firebase_admin
+
+import json
+import firebase_admin
+from firebase_admin import credentials
+from firebase_admin import firestore
+from firebase_admin import db
+
+# Firebase database 인증 및 앱 초기화
+
+data = {}
+
+class DBLink:
+    def __init__(self, userid):
+        # 로그인
+        self.userid = userid
+   
+    def rwJson(self):
+        # 윈도우 경로 : r'lms_assignment/'
+        # 리눅스 경로 : './assignmentJson/' 
+        with open('./assignmentJson/' + self.userid + '.json', 'r+', encoding = "UTF-8") as f: 
+            tmp = json.load(f)
+            data[self.userid] = tmp
+    
+    def Link(self):
+        db_url = 'https://lms-assignment-default-rtdb.firebaseio.com/'
+
+        if not firebase_admin._apps:
+            cred = credentials.Certificate("firebase.json")
+            firebase_admin.initialize_app(cred, {
+                'databaseURL' : db_url
+            })
+
+        # 학번이 있는지 확인, 이후 db.reference('학번') 으로 JSON Response
+        ref = db.reference('')
+        ref.update({self.userid : data[self.userid]})
+```
+
+
+<img src=https://user-images.githubusercontent.com/78135526/164879401-366ad8ec-8c0a-41f6-8861-6e89164439fd.png width = 500 height = 230>
+
+* DB에서 모든 학생의 과제 정보를 가지고 있어야 하기에 그에 맞은 키를 주기 위해 받은 userid를 key로 설정하고 크롤링으로 부터 받은 JSON을 value로 저장한다.
