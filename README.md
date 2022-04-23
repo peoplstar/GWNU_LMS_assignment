@@ -154,7 +154,8 @@ class DBLink:
         ref.update({self.userid : data[self.userid]})
 ```
 
-
+<p align="center">
 <img src=https://user-images.githubusercontent.com/78135526/164879401-366ad8ec-8c0a-41f6-8861-6e89164439fd.png width = 500 height = 230>
+</p>
 
 * DB에서 모든 학생의 과제 정보를 가지고 있어야 하기에 그에 맞은 키를 주기 위해 받은 userid를 key로 설정하고 크롤링으로 부터 받은 JSON을 value로 저장한다.
