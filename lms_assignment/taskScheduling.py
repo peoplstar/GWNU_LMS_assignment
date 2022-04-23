@@ -1,6 +1,7 @@
 # pip install firebase_admin
 
 import json
+from time import strptime
 import firebase_admin
 import Pldd
 from firebase_admin import credentials
@@ -11,9 +12,13 @@ from datetime import datetime
 # 비교 전 제출 기한 over delete
 # Firebase ID / PW 접근 후 Pldd
 # DB & JSON 비교
-def timeControl():
+def timeControl(d_day_end):
+    #self.d_day_end = d_day_end
     now = datetime.now()
-    print(now.strftime('%Y-%m-%d %H:%M:%S'))
+    now = now.strftime('%Y-%m-%d %H:%M')
+    now = datetime.strptime(now, '%Y-%m-%d %H:%M')
+    diff = d_day_end - now
+    print(diff)
     # return 타임 비교 값
     
 class taskScheduling:
@@ -29,8 +34,10 @@ class taskScheduling:
         ref = db.reference('')
         key_list = (ref.get().keys()) # 학번만 출력 ref.get().keys()
         # timeControl()
-        d_day_end = db.reference('20171473')
-        print(d_day_end)
+        d_day_end = db.reference('20171473/task/0/d_day_end').get() # Time key
+        d_day_end = datetime.strptime(d_day_end, '%Y-%m-%d %H:%M')
+        #print(type(d_day_end)) # Time value
+        timeControl(d_day_end)
         '''
         for id in key_list:
             userid = db.reference(id + '/passwd')   
@@ -41,7 +48,7 @@ class taskScheduling:
             
             
             Crawling 된 JSON을 Firebase와 비교
-            '''
+        '''
             # print(f'userid : {id} passwd : {passwd}')
             
             
