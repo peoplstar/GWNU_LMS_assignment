@@ -98,7 +98,7 @@ INSTALLED_APPS는 REST API를 사용하기 위해 `rest_framework` 명시, 우�
 
 * JSON은 **{key : value}** 로 이루어져 있는 파일의 형태이기 때문에 key로 접근이 가능하다.
 
-> Crawling
+> ### Crawling
 ```python
 # Parameter 전송을 위한 Class 선언
 class crawling:    
@@ -114,7 +114,7 @@ class crawling:
 ```
 * 별도의 클래스로 지정해주지 않아 `views.py`로 받은 ID와 PW를 넘기기 위해 위 처럼 수정을 해줬다.
 
-> FirebaseLink.py
+> ### FirebaseLink.py
 ```python
 # pip install firebase_admin
 
