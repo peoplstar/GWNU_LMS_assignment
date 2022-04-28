@@ -8,9 +8,10 @@ from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from selenium.common.exceptions import NoSuchElementException # 예외지정
-from selenium.webdriver.chrome.service import Service # 추가
-from webdriver_manager.chrome import ChromeDriverManager # 추가
+from selenium.webdriver.chrome.service import Service
+from webdriver_manager.chrome import ChromeDriverManager
+from selenium.webdriver.common.desired_capabilities import DesiredCapabilities # 추가
+from selenium.webdriver.common.alert import Alert
 from bs4 import BeautifulSoup as bs
 
 import time
@@ -32,7 +33,18 @@ class crawling:
         chrome_options.add_argument("--headless")
         chrome_options.add_argument("--start-maximized")
         chrome_options.add_argument("--window-size=1920,1080")
+        chrome_options.add_argument("--disable-gpu")  # 추가
+        chrome_options.add_argument("--disable-infobars") # 추가
+        chrome_options.add_argument("--disable-extensions") # 추가
+        chrome_options.add_argument("--disable-popup-blocking") # 추가
+        
+        # 속도 향상을 위한 옵션 해제 추가
+        prefs = {'profile.default_content_setting_values': {'cookies' : 2, 'images': 2, 'plugins' : 2, 'popups': 2, 'geolocation': 2, 'notifications' : 2, 'auto_select_certificate': 2, 'fullscreen' : 2, 'mouselock' : 2, 'mixed_script': 2, 'media_stream' : 2, 'media_stream_mic' : 2, 'media_stream_camera': 2, 'protocol_handlers' : 2, 'ppapi_broker' : 2, 'automatic_downloads': 2, 'midi_sysex' : 2, 'push_messaging' : 2, 'ssl_cert_decisions': 2, 'metro_switch_to_desktop' : 2, 'protected_media_identifier': 2, 'app_banner': 2, 'site_engagement' : 2, 'durable_storage' : 2}}   
+        chrome_options.add_experimental_option('prefs', prefs) # 추가
 
+        caps = DesiredCapabilities().CHROME  # 추가
+        caps["pageLoadStrategy"] = "none"   # 추가
+        
         # Chromedriver 경로 설정
         browser = webdriver.Chrome(service = Service(ChromeDriverManager().install()), options = chrome_options) # 추가
     
@@ -40,9 +52,10 @@ class crawling:
         browser.get("https://portal.gwnu.ac.kr/user/login.face?ssoReturn=https://lms.gwnu.ac.kr")
         
         # id, pw 입력
-        
-        browser.find_element(By.ID, "userId").send_keys(self.userid) # 추가
-        browser.find_element(By.ID, "password").send_keys(self.password) # 추가
+        idBox = browser.find_element(By.ID, "userId")
+        pwBox = browser.find_element(By.ID, "password")
+        browser.execute_script("arguments[0].value=arguments[1]", idBox, self.userid) # 추가
+        browser.execute_script("arguments[0].value=arguments[1]", pwBox, self.password) # 추가
 
         
         # 로그인 완료
@@ -95,7 +108,15 @@ class crawling:
 
             # 수강과목 클릭
             searching.click()
-
+            print("Here1")
+            try :
+                print("Alert before")
+                Alert(browser).dismiss() # 팝업 제거
+                subject_list.remove(i)    
+                print("Alert After")
+                continue # 이후 88번 코드 main NoSuchFrameException
+            except :
+                pass
             # 수강과목 과제 클릭
             # browser.find_element(By.XPATH, '//*[@id="3"]/ul/li[2]/a').click()
             WebDriverWait(browser, 10).until(EC.element_to_be_clickable((By.XPATH, '//*[@id="3"]/ul/li[2]/a'))).click() # 추가
@@ -183,7 +204,7 @@ class crawling:
         b_dict = {"task": a_dict} # key 값 변경
 
         # JSON 파일 경로 변경
-        with open('./assignmentJson/'+ self.userid +'.json', 'w', encoding = "UTF-8") as f : 
+        with open('./assignmentJson/'+ self.userid +'.json', 'w+', encoding = "UTF-8") as f : 
             json.dump(b_dict, f, ensure_ascii = False, default = str, indent = 4)
 
         # 브라우저 종료
