@@ -17,8 +17,10 @@ def timeControl(d_day_end):
     now = datetime.now()
     now = now.strftime('%Y-%m-%d %H:%M')
     now = datetime.strptime(now, '%Y-%m-%d %H:%M')
+    print(f'd_day_end = {d_day_end}')
     diff = d_day_end - now
-    print(diff)
+    print(d_day_end> now) # d_day_end 가 now 보다 과거일 경우 False
+
     # return 타임 비교 값
     
 class taskScheduling:
@@ -33,8 +35,9 @@ class taskScheduling:
         
         ref = db.reference('')
         key_list = (ref.get().keys()) # 학번만 출력 ref.get().keys()
+        
         # timeControl()
-        d_day_end = db.reference('20171473/task/0/d_day_end').get() # Time key
+        d_day_end = db.reference('20171456/task/0/d_day_end').get() # Time key
         d_day_end = datetime.strptime(d_day_end, '%Y-%m-%d %H:%M')
         #print(type(d_day_end)) # Time value
         timeControl(d_day_end)
