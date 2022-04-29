@@ -3,16 +3,16 @@
 # pip install bs4
 # pip install lxml
 
-from xml.dom.minidom import Element
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from selenium.common.exceptions import NoSuchElementException # 예외지정
 from selenium.webdriver.chrome.service import Service
+from selenium.common.exceptions import UnexpectedAlertPresentException as PE # 팝업 예외 지정
 from webdriver_manager.chrome import ChromeDriverManager
-from selenium.webdriver.common.desired_capabilities import DesiredCapabilities # 추가
-from selenium.webdriver.common.alert import Alert
 from bs4 import BeautifulSoup as bs
+from xml.dom.minidom import Element
 
 import time
 import bs4
@@ -31,7 +31,6 @@ class crawling:
 
         # 브라우저 창 없이 실행
         chrome_options.add_argument("--headless")
-        chrome_options.add_argument("--start-maximized")
         chrome_options.add_argument("--window-size=1920,1080")
         chrome_options.add_argument("--disable-gpu")  # 추가
         chrome_options.add_argument("--disable-infobars") # 추가
@@ -39,29 +38,24 @@ class crawling:
         chrome_options.add_argument("--disable-popup-blocking") # 추가
         
         # 속도 향상을 위한 옵션 해제 추가
-        prefs = {'profile.default_content_setting_values': {'cookies' : 2, 'images': 2, 'plugins' : 2, 'popups': 2, 'geolocation': 2, 'notifications' : 2, 'auto_select_certificate': 2, 'fullscreen' : 2, 'mouselock' : 2, 'mixed_script': 2, 'media_stream' : 2, 'media_stream_mic' : 2, 'media_stream_camera': 2, 'protocol_handlers' : 2, 'ppapi_broker' : 2, 'automatic_downloads': 2, 'midi_sysex' : 2, 'push_messaging' : 2, 'ssl_cert_decisions': 2, 'metro_switch_to_desktop' : 2, 'protected_media_identifier': 2, 'app_banner': 2, 'site_engagement' : 2, 'durable_storage' : 2}}   
-        chrome_options.add_experimental_option('prefs', prefs) # 추가
+        # prefs = {'profile.default_content_setting_values': {'cookies' : 2, 'images': 2, 'plugins' : 2, 'popups': 2, 'geolocation': 2, 'notifications' : 2, 'auto_select_certificate': 2, 'fullscreen' : 2, 'mouselock' : 2, 'mixed_script': 2, 'media_stream' : 2, 'media_stream_mic' : 2, 'media_stream_camera': 2, 'protocol_handlers' : 2, 'ppapi_broker' : 2, 'automatic_downloads': 2, 'midi_sysex' : 2, 'push_messaging' : 2, 'ssl_cert_decisions': 2, 'metro_switch_to_desktop' : 2, 'protected_media_identifier': 2, 'app_banner': 2, 'site_engagement' : 2, 'durable_storage' : 2}}   
+        # chrome_options.add_experimental_option('prefs', prefs) # 추가
 
-        caps = DesiredCapabilities().CHROME  # 추가
-        caps["pageLoadStrategy"] = "none"   # 추가
+        # caps = DesiredCapabilities().CHROME  # 추가
+        # caps["pageLoadStrategy"] = "none"   # 추가
         
         # Chromedriver 경로 설정
         browser = webdriver.Chrome(service = Service(ChromeDriverManager().install()), options = chrome_options) # 추가
     
         # url 이동
-        browser.get("https://portal.gwnu.ac.kr/user/login.face?ssoReturn=https://lms.gwnu.ac.kr")
-        
-        # id, pw 입력
-        idBox = browser.find_element(By.ID, "userId")
-        pwBox = browser.find_element(By.ID, "password")
-        browser.execute_script("arguments[0].value=arguments[1]", idBox, self.userid) # 추가
-        browser.execute_script("arguments[0].value=arguments[1]", pwBox, self.password) # 추가
+        browser.get("https://lms.gwnu.ac.kr/Main.do?cmd=viewHome&userDTO.localeKey=ko")  # 변경
 
-        
-        # 로그인 완료
-        # browser.find_element_by_xpath("/html/body/div/div/div[1]/div/div/div[1]/a").click()
-        # browser.find_element(By.XPATH, "/html/body/div/div/div[1]/div/div/div[1]/a").click() # 추가
-        WebDriverWait(browser, 10).until(EC.element_to_be_clickable((By.XPATH, "/html/body/div/div/div[1]/div/div/div[1]/a"))).click() # 추가
+        # id, pw 입력 기존 방식과 다른 붙여넣기 방식으로 입력
+        browser.execute_script("arguments[0].value=arguments[1]", browser.find_element(By.ID, "id"), self.userid) # 추가
+        browser.execute_script("arguments[0].value=arguments[1]", browser.find_element(By.ID, "pw"), self.password) # 추가
+
+        # 로그인 버튼 클릭
+        WebDriverWait(browser, 5).until(EC.element_to_be_clickable((By.XPATH, "//*[@id='loginForm']/fieldset/p[2]/a"))).click() # 변경
 
         # 현재 수강 과목 리스트로 저장 (최대 8개)
         subject_list = ['//*[@id="mCSB_1_container"]/li[1]/a/span[1]',
@@ -83,40 +77,40 @@ class crawling:
         course_result = []
         clear_result = []
         progress_result = []
-        
+
         # json 리스트 선언
         dict_key = []
         temp_dict = {}
 
+        a_dict = []
+        b_dict = {}
+
         # 과제 정보 가져오기
         for i in subject_list :
-
+        
             # 팝업창 삭제
             try :
                 browser.find_element((By.XPATH, "/html/body/div[4]/div[1]/button/span[1]")).click() # 추가
             except :
                 pass
-
+            
             # 리스트에 없는 과목 예외처리
             try :
                 searching = browser.find_element(By.XPATH, i)
             except :
                 print("모든 과제를 불러왔습니다.")
                 break
-
+            
             # 수강과목 클릭
             searching.click()
             try : 
                 WebDriverWait(browser, 0.2).until(EC.alert_is_present())
                 alert = browser.switch_to.alert
-
                 alert.accept()
-                
                 continue
-
             except :        
                 try :
-                    # 수강과목 과제 클릭
+                     # 수강과목 과제 클릭
                     WebDriverWait(browser, 2).until(EC.element_to_be_clickable((By.XPATH, '//*[@id="3"]/ul/li[2]/a'))).click() # 추가
                     time.sleep(3)
                     # 수강과목 이름,과제내용 가져오기
@@ -145,11 +139,11 @@ class crawling:
                     # 제출기한 시작 저장
                     for d_day_start in d_days:
                         d_day_start_result.append(d_day_start.get_text().replace("\t","").replace("\n","").replace("\xa0","").replace("과제 정보 리스트제출기간점수공개일자연장제출제출여부평가점수","")[slice1])
-                    
+
                     # 제출기한 끝 저장
                     for d_day_end in d_days:
                         d_day_end_result.append(d_day_end.get_text().replace("\t","").replace("\n","").replace("\xa0","").replace("과제 정보 리스트제출기간점수공개일자연장제출제출여부평가점수","")[slice2])
-                        
+
                     # 제출여부 저장
                     for clear in d_days:
                         clear_result.append(clear.get_text().replace("\t","").replace("\n","").replace("\xa0","")
@@ -159,16 +153,16 @@ class crawling:
                                                             .replace("9","").replace("0","").replace("-","").replace(".","")
                                                             .replace("~","").replace(":","").replace(" ","").replace("(","")
                                                             .replace(")","").replace("미허용","").replace("허","").replace("용",""))
-                        
+
                     # 과제내용 저장
                     for content in contents:
                         content_result.append(content.get_text().replace("\t","").replace("\n","").replace("\xa0",""))
-                    
+
 
                     # 과제진행여부 저장 추가
                     for progress in progresses:
                         progress_result.append(progress.get_text().replace("\t","").replace("\n","").replace("\xa0",""))
-                    
+
                     def getprogress(ch):
                         if ch == "[진행중]" or ch == "[마감]" or ch == "[진행예정]":
                             return True
@@ -176,18 +170,17 @@ class crawling:
                             return None
 
                     progress_result = list(filter(getprogress, progress_result)) 
-                    
+
                     # 첫 화면으로 가기 위한 뒤로가기 두번
                     browser.back()
                     browser.back()
                 except :
                     continue
                 continue
-        # json 파일용 딕셔너리 생성    
-
+            
+        # json 파일용 딕셔너리 생성
         count = len(title_result)
-        a_dict = []
-        b_dict = {}
+
         for j in range(count):
             dict_key.insert(j, 'tasks%d' %j)
             if progress_result[j] == "[진행중]" or progress_result[j] == "[진행예정]":
@@ -196,12 +189,12 @@ class crawling:
                 a_dict.append(temp_dict)
             else:
                 pass
+            
+        b_dict = {"task": a_dict}
 
-        b_dict = {"task": a_dict} # key 값 변경
-
-        # JSON 파일 경로 변경
         with open('./assignmentJson/'+ self.userid +'.json', 'w+', encoding = "UTF-8") as f : 
             json.dump(b_dict, f, ensure_ascii = False, default = str, indent = 4)
+
 
         # 브라우저 종료
         browser.quit()
