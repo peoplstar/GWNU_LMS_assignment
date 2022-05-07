@@ -190,8 +190,8 @@ class crawling:
             else:
                 pass
             
-        b_dict = {"task": a_dict}
-
+        b_dict = {"task" : a_dict}
+        b_dict = {"pw" : self.password}
         with open('./assignmentJson/'+ self.userid +'.json', 'w+', encoding = "UTF-8") as f : 
             json.dump(b_dict, f, ensure_ascii = False, default = str, indent = 4)
 
