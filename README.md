@@ -35,6 +35,13 @@
 
 * 필자는 `api_app`으로 생성했습니다.
 
+`pip install chromedriver-autoinstaller`
+
+* <a href = https://tttap.tistory.com/221>크롬 설치 </a>
+
+`pip install -U urllib3 requests` : requests & responses 를 위한 설치
+
+
 > ### models.py 설정
 
 ```python
@@ -52,6 +59,8 @@ class lmsItem(models.Model):
 * 이후, Firebase FCM PUSH를 위한 FirebaseToken을 받아야 하므로 주석으로 처리했다.
 
 > ### Settings.py 설정
+
+
 Settings.py의 경로는 `[projectname]/[projectname]/settings.py` 에서 확인 가능하다.
 
 
