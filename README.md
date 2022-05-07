@@ -159,3 +159,56 @@ class DBLink:
 </p>
 
 * DB에서 모든 학생의 과제 정보를 가지고 있어야 하기에 그에 맞은 키를 주기 위해 받은 userid를 key로 설정하고 크롤링으로 부터 받은 JSON을 value로 저장한다.
+
+
+> ### TaskScheduling.py
+```python
+data = {}
+
+def timeControl(d_day_end):
+    now = datetime.now()
+    now = now.strftime('%Y-%m-%d %H:%M')
+    now = datetime.strptime(now, '%Y-%m-%d %H:%M')
+
+    return (d_day_end > now) # d_day_end 가 now 보다 과거일 경우 False
+```
+
+* DB에 저장되어 있는 D_day_end의 시간과 현재 시간을 비교하여 미리 종료가 된 과제의 경우 False를 Return하여 로직을 수행한다.
+
+```python
+def access():
+    db_url = 'https://lms-assignment-default-rtdb.firebaseio.com/'
+    if not firebase_admin._apps:
+        cred = credentials.Certificate("Firebase.json")
+        firebase_admin.initialize_app(cred, {
+            'databaseURL' : db_url
+        })
+    
+    ref = db.reference('')
+    dict_key_list = ref.get().keys() # 학번 dictionary's keys
+    key_list = list(dict_key_list) # 학번 List 변환
+    
+    # DB에 저장된 ID와 PW로 크롤링 한 JSON 파일 로딩
+    
+    for key in key_list:
+        task_list = db.reference(key + '/task').get()
+        taskCnt = len(list(filter(None, task_list))) # Remove None data in List
+        
+        for task in range(0, taskCnt):
+            r = db.reference(key + '/task/' + str(task) + '/d_day_end') # 과제 별 마감 시간
+            timeResult = timeControl(datetime.strptime(r.get(), '%Y-%m-%d %H:%M'))
+            
+            # 시간 값 비교 해당 과제 삭제
+            if timeResult == False:
+                deleteItem = db.reference(key + '/task/' + str(task))
+                deleteItem.delete()
+                taskCnt -= 1
+        
+        pw = db.reference(key + '/pw').get() # DB id, pw Link
+        crawSystem = Pldd.crawling(key, pw)
+         
+        newTask = crawSystem.craw()
+        newTaskCnt = rwJson(key)
+```
+
+* `timeControl`로 수행한 결과 값을 토대로 해당 과제를 delete하는 경우 그 위치의 List Item는 None으로 초기화 되기에 `taskCnt = len(list(filter(None, task_list)))` Filter() 함수를 이용하여 None을 지운다.
