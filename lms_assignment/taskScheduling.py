@@ -20,9 +20,8 @@ def timeControl(d_day_end):
     now = datetime.now()
     now = now.strftime('%Y-%m-%d %H:%M')
     now = datetime.strptime(now, '%Y-%m-%d %H:%M')
-    # print(f'd_day_end = {d_day_end}')
 
-    print(d_day_end > now) # d_day_end 가 now 보다 과거일 경우 False
+    return (d_day_end > now) # d_day_end 가 now 보다 과거일 경우 False
 
     # return 타임 비교 값
     
@@ -31,31 +30,31 @@ class taskScheduling:
         db_url = 'https://lms-assignment-default-rtdb.firebaseio.com/'
 
         if not firebase_admin._apps:
-            cred = credentials.Certificate("Firebase.json")
+            cred = credentials.Certificate("./lms-assignment-firebase-adminsdk-gg9hv-0e2b022f8b.json")
             firebase_admin.initialize_app(cred, {
                 'databaseURL' : db_url
             })
         
         ref = db.reference('')
-        dict_key_list = ref.get().keys() # 학번만 출력 ref.get().keys()
+        dict_key_list = ref.get().keys() # 학번 dictionary's keys
         key_list = list(dict_key_list) # 학번 List 변환
         task_list = db.reference(key_list[0] + '/task').get()
-        tmp = db.reference(key_list[0] + '/task/0').get()
 
         for task in range(0, len(task_list)):
             r = db.reference(key_list[0] + '/task/' + str(task) + '/d_day_end') # 과제 별 마감 시간
-            print(r.get())
+            timeResult = timeControl(datetime.strptime(r.get(), '%Y-%m-%d %H:%M')) # 과제 마감 시간
             
-        # for key in key_list:
-        #     for task in task_list:
-        #         time = db.reference(key + task + '/d_day_end').get()
-        #         ret = timeControl(time)
-        #         if ret == False :
+            # 시간 값 비교 해당 과제 삭제
+            if timeResult == False:
+                deleteItem = db.reference(key_list[0] + '/task/' + str(task))
+                print(f'Time Result == {timeResult}')
+                deleteItem.delete()
+                
 
-        #d_day_end = db.reference('20171456/task/0/d_day_end').get() # Time key
-        #d_day_end = datetime.strptime(d_day_end, '%Y-%m-%d %H:%M')
-        #print(type(d_day_end)) # Time value
-        #timeControl(d_day_end)
+        # d_day_end = db.reference('20171456/task/0/d_day_end').get() # Time key
+        # d_day_end = datetime.strptime(d_day_end, '%Y-%m-%d %H:%M')
+        # print(type(d_day_end)) # Time value
+        # timeControl(d_day_end)
         
         '''
         for id in key_list:
