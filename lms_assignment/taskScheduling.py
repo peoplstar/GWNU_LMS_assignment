@@ -29,6 +29,13 @@ def rwJson(key):
         tmp = json.load(f)
         data = tmp
         return len(data['task'])
+
+def isNone(r):
+    if r.get() == None:
+        return 'isNone'
+    else:
+        return 'isNotNone'
+
     
 class taskScheduling:
     def access():
@@ -44,45 +51,35 @@ class taskScheduling:
         dict_key_list = ref.get().keys() # 학번 dictionary's keys
         key_list = list(dict_key_list) # 학번 List 변환
         
-        # DB에 저장된 ID와 PW로 크롤링 한 JSON 파일 로딩
+        # DB에 저장된 ID와 PW로 크롤링 한 JSON 파일 로딩     
         
         for key in key_list:
             task_list = db.reference(key + '/task').get()
-            taskCnt = len(list(filter(None, task_list))) # Remove None data in List
+            taskCnt = len(list(task_list)) # Remove None data in List
             
             for task in range(0, taskCnt):
                 r = db.reference(key + '/task/' + str(task) + '/d_day_end') # 과제 별 마감 시간
-                timeResult = timeControl(datetime.strptime(r.get(), '%Y-%m-%d %H:%M'))
-                
-                # 시간 값 비교 해당 과제 삭제
-                if timeResult == False:
-                    deleteItem = db.reference(key + '/task/' + str(task))
-                    deleteItem.delete()
+                if isNone(r) == 'isNone': # 삭제 이후 과제 번호가 없으면 None 값
                     taskCnt -= 1
+                    continue
+                else:
+                    timeResult = timeControl(datetime.strptime(r.get(), '%Y-%m-%d %H:%M'))
+                    
+                    # 시간 값 비교 해당 과제 삭제
+                    if timeResult == False:
+                        deleteItem = db.reference(key + '/task/' + str(task))
+                        deleteItem.delete()
+                        taskCnt -= 1
             
             pw = db.reference(key + '/pw').get() # DB id, pw Link
-            crawSystem = Pldd.crawling(key, pw)
-             
-            newTask = crawSystem.craw()
+            crawSystem = Pldd.crawling(key, pw)  
+            crawSystem.craw()
             newTaskCnt = rwJson(key)
+            
+            if newTaskCnt == taskCnt:
+                # PUSH
+                pass
 
-        # d_day_end = db.reference('20171456/task/0/d_day_end').get() # Time key
-        # d_day_end = datetime.strptime(d_day_end, '%Y-%m-%d %H:%M')
-        # print(type(d_day_end)) # Time value
-        # timeControl(d_day_end)
-        
-        '''
-        for id in key_list:
-            userid = db.reference(id + '/passwd')   
-            passwd = userid.get() # 복호화 과정 필요
-            
-            craws = Pldd.crawling(userid, passwd)
-            craws.craw()
-            
-            
-            Crawling 된 JSON을 Firebase와 비교
-        '''
-        
 def main():
     taskScheduling.access()
     
