@@ -5,6 +5,7 @@ from time import strptime
 from turtle import st
 import firebase_admin
 import Pldd
+import push_fcm_notification
 from firebase_admin import credentials
 from firebase_admin import firestore
 from firebase_admin import db
@@ -68,16 +69,15 @@ class taskScheduling:
                         deleteItem.delete()
                         taskCnt -= 1
             
-            pw = db.reference(key + '/pw').get() # DB id, pw Link
-            token = None
-            crawSystem = Pldd.crawling(key, pw, token)  
+            pw = db.reference(key + '/pw').get()
+            crawToken = None
+            crawSystem = Pldd.crawling(key, pw, crawToken)  
             crawSystem.craw()
             newTaskCnt = newTaskCrawlingCnt(key)
             
-            if newTaskCnt == taskCnt:
-                push_fcm_notification()
-                # PUSH
-                pass
+            if newTaskCnt != taskCnt:
+                token = db.reference(key + '/token').get()
+                push_fcm_notification.sendMessage("강릉원주대학교 과제", "새로운 과제가 등록 되었습니다.", token)
 
 def main():
     taskScheduling.access()
