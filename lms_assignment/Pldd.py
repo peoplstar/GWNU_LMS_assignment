@@ -21,10 +21,11 @@ import re
 
 # Parameter 전송을 위한 Class 선언
 class crawling:    
-    def __init__(self, userid, password):
+    def __init__(self, userid, password, token = None):
         # 로그인
         self.userid = userid
         self.password = password
+        self.token = token
         
     def craw(self):
         chrome_options = webdriver.ChromeOptions()
@@ -192,6 +193,12 @@ class crawling:
             
         b_dict = {"task" : a_dict}
         b_dict = {"pw" : self.password}
+        
+        if self.token != None:
+            b_dict = {"token" : self.token}
+        else:
+            pass
+        
         with open('./assignmentJson/'+ self.userid +'.json', 'w+', encoding = "UTF-8") as f : 
             json.dump(b_dict, f, ensure_ascii = False, default = str, indent = 4)
 
