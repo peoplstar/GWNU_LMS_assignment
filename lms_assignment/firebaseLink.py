@@ -22,7 +22,7 @@ class DBLink:
             tmp = json.load(f)
             data[self.userid] = tmp
     
-    def Link(self):
+    def Link(self): 
         db_url = 'https://lms-assignment-default-rtdb.firebaseio.com/'
 
         if not firebase_admin._apps:
