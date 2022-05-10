@@ -21,10 +21,9 @@ def timeControl(d_day_end):
     now = datetime.now()
     now = now.strftime('%Y-%m-%d %H:%M')
     now = datetime.strptime(now, '%Y-%m-%d %H:%M')
-
     return (d_day_end > now) # d_day_end 가 now 보다 과거일 경우 False
 
-def rwJson(key): 
+def newTaskCrawlingCnt(key): 
     with open('./assignmentJson/' + key + '.json', 'r+', encoding = "UTF-8") as f: 
         tmp = json.load(f)
         data = tmp
@@ -42,7 +41,7 @@ class taskScheduling:
         db_url = 'https://lms-assignment-default-rtdb.firebaseio.com/'
 
         if not firebase_admin._apps:
-            cred = credentials.Certificate("Firebase.json")
+            cred = credentials.Certificate("./lms-assignment-firebase-adminsdk-gg9hv-0e2b022f8b.json")
             firebase_admin.initialize_app(cred, {
                 'databaseURL' : db_url
             })
@@ -55,7 +54,7 @@ class taskScheduling:
         
         for key in key_list:
             task_list = db.reference(key + '/task').get()
-            taskCnt = len(list(task_list)) # Remove None data in List
+            taskCnt = len(list(task_list))
             
             for task in range(0, taskCnt):
                 r = db.reference(key + '/task/' + str(task) + '/d_day_end') # 과제 별 마감 시간
@@ -64,19 +63,19 @@ class taskScheduling:
                     continue
                 else:
                     timeResult = timeControl(datetime.strptime(r.get(), '%Y-%m-%d %H:%M'))
-                    
-                    # 시간 값 비교 해당 과제 삭제
-                    if timeResult == False:
+                    if timeResult == False: # 시간 값 비교 해당 과제 삭제
                         deleteItem = db.reference(key + '/task/' + str(task))
                         deleteItem.delete()
                         taskCnt -= 1
             
             pw = db.reference(key + '/pw').get() # DB id, pw Link
-            crawSystem = Pldd.crawling(key, pw)  
+            token = None
+            crawSystem = Pldd.crawling(key, pw, token)  
             crawSystem.craw()
-            newTaskCnt = rwJson(key)
+            newTaskCnt = newTaskCrawlingCnt(key)
             
             if newTaskCnt == taskCnt:
+                push_fcm_notification()
                 # PUSH
                 pass
 
