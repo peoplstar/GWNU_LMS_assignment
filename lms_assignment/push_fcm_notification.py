@@ -16,7 +16,4 @@ def sendMessage(body, title, local_token):
     }
  
     # 토큰값을 이용해 1명에게 푸시알림을 전송함
-    result = push_service.single_device_data_message(registration_id = token, data_message = data_message)
- 
- 
-sendMessage("강릉원주대학교 과제", "새로운 과제가 등록 되었습니다.")
+    push_service.single_device_data_message(registration_id = token, data_message = data_message)
