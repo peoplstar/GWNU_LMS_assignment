@@ -41,6 +41,7 @@ class lmsItemViews(APIView):
             tmp = json.loads(dump)
             userid = tmp['lms_id']
             password = tmp['lms_pw']
+            token = tmp['firebaseToken']
             db_url = 'https://lms-assignment-default-rtdb.firebaseio.com/'
 
             if not firebase_admin._apps:
@@ -52,8 +53,7 @@ class lmsItemViews(APIView):
             ref = db.reference(userid)
             if isNone(ref) == isNone:
                 # Crawling Method Parameter 
-                crawSystem = Pldd.crawling(userid, password)
-                
+                crawSystem = Pldd.crawling(userid, password, token)
                 try :
                     txt = crawSystem.craw()
                     status_code = 200
@@ -73,9 +73,3 @@ class lmsItemViews(APIView):
                 return Response(txt, status = status.HTTP_200_OK)
             else:
                 return Response({"data" : txt}, status = status.HTTP_400_BAD_REQUEST)
-        #()
-        '''
-        else:
-            return Response("Login Failed")
-        {"status " : "Login Failed", "data" : serializer.errors}, status = status.HTTP_400_BAD_REQUEST)
-        '''
