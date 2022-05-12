@@ -192,10 +192,10 @@ class crawling:
                 pass
             
         b_dict = {"task" : a_dict}
-        b_dict = {"pw" : self.password}
+        b_dict["pw"] = self.password
         
         if self.token != None:
-            b_dict = {"token" : self.token}
+            b_dict["token"] = self.token
         else:
             pass
         
@@ -205,4 +205,3 @@ class crawling:
 
         # 브라우저 종료
         browser.quit()
-        return b_dict
