@@ -1,6 +1,6 @@
 from pyfcm import FCMNotification
  
-APIKEY = "AAAAmflPfQQ:APA91bEuJalspiK5RlQ-x5LN1zgpcfhO3mZNbDRMIf-DuuksI8zDGwduvMEpjk8-45sj06AnOMyoDL7CEYx-G3lFVj-UM5Kp2RQQzQxfzOBg5D0JRgQv8CjqEoOM7nkY7usEit5YZLK6"
+APIKEY = "Server Key"
  
 # 파이어베이스 콘솔에서 얻어 온 서버 키를 넣어 줌
 push_service = FCMNotification(APIKEY)
