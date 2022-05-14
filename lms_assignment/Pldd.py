@@ -192,16 +192,13 @@ class crawling:
                 pass
             
         b_dict = {"task" : a_dict}
-        b_dict["pw"] = self.password
-        
-        if self.token != None:
-            b_dict["token"] = self.token
-        else:
-            pass
+        b_dict["pw"] = self.password        
+        b_dict["token"] = self.token
         
         with open('./assignmentJson/'+ self.userid +'.json', 'w+', encoding = "UTF-8") as f : 
             json.dump(b_dict, f, ensure_ascii = False, default = str, indent = 4)
 
 
         # 브라우저 종료
-        browser.quit()
+        browser.close()
+        return b_dict
