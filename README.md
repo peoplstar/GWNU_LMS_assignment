@@ -101,6 +101,8 @@ INSTALLED_APPS는 REST API를 사용하기 위해 `rest_framework` 명시, 우�
 
   * ##### *추후 https를 이용해 보완*   
 
+* PUSH 알림을 위한 FCM Token값을 위해 `token = tmp['token']`을 추가
+
 * FireBase와 연동을 위해 `firebaseLink`를 import 하고, 파싱된 userid를 매개변수로 넘겨 DB에 Assignmnet data를 저장한다.
    
 * 모바일과의 통신으로부터 얻은 ID와 PW를 python 객체로 얻기 위해 `dumps`와 `loads`를 동시에 사용한다.
@@ -111,17 +113,18 @@ INSTALLED_APPS는 REST API를 사용하기 위해 `rest_framework` 명시, 우�
 ```python
 # Parameter 전송을 위한 Class 선언
 class crawling:    
-    def __init__(self, userid, password):
+    def __init__(self, userid, password, token = None):
         # 로그인
         self.userid = userid
         self.password = password
-        
+        self.token = token
+
     def craw(self):
         chrome_options = webdriver.ChromeOptions()
 
         # 브라우저 창 없이 실행
 ```
-* 별도의 클래스로 지정해주지 않아 `views.py`로 받은 ID와 PW를 넘기기 위해 위 처럼 수정을 해줬다.
+* 별도의 클래스로 지정해주지 않아 `views.py`로 받은 ID, PW, FCM Token을 넘기기 위해 위 처럼 수정을 해줬다.
 
 > ### FirebaseLink.py
 ```python
@@ -221,3 +224,6 @@ def access():
 ```
 
 * `timeControl`로 수행한 결과 값을 토대로 해당 과제를 delete하는 경우 그 위치의 List Item는 None으로 초기화 되기에 `taskCnt = len(list(filter(None, task_list)))` Filter() 함수를 이용하여 None을 지운다.
+
+> ### push_fcm_notification.py
+* taskScheduling.py로 스케쥴링 시 PUSH 알림을 위한 코드 작성
