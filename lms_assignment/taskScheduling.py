@@ -2,10 +2,10 @@
 
 import json
 from time import strptime
-from turtle import st
 import firebase_admin
 import Pldd
 import push_fcm_notification
+import firebaseLink
 from firebase_admin import credentials
 from firebase_admin import firestore
 from firebase_admin import db
@@ -78,6 +78,9 @@ class taskScheduling:
             if newTaskCnt != taskCnt:
                 token = db.reference(key + '/token').get()
                 push_fcm_notification.sendMessage("강릉원주대학교 과제", "새로운 과제가 등록 되었습니다.", token)
+                firedb = firebaseLink.DBLink(key)
+                firedb.rwJson()
+                firedb.Link()
 
 def main():
     taskScheduling.access()
