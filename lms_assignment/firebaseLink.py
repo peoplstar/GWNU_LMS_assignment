@@ -14,7 +14,7 @@ class DBLink:
     def __init__(self, userid):
         # 로그인
         self.userid = userid
-   
+        
     def rwJson(self):
         # 윈도우 경로 : r'lms_assignment/'
         # 리눅스 경로 : './assignmentJson/' 
@@ -34,3 +34,4 @@ class DBLink:
         # 학번이 있는지 확인, 이후 db.reference('학번') 으로 JSON Response
         ref = db.reference('')
         ref.update({self.userid : data[self.userid]})
+        # ref.update({'token' : self.token})
