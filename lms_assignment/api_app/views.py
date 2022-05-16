@@ -33,30 +33,31 @@ class lmsItemViews(APIView):
         if serializer.is_valid():
             # serializer.save()
 
-            ref = db.reference('')
-            dict_key_list = ref.get().keys() # 학번 dictionary's keys
-            key_list = list(dict_key_list) # 학번 List 변환
+
             inform = request.data
             dump = json.dumps(inform)
             tmp = json.loads(dump)
             userid = tmp['lms_id']
             password = tmp['lms_pw']
-            token = tmp['firebaseToken']
+            token = tmp['token']
             db_url = 'https://lms-assignment-default-rtdb.firebaseio.com/'
-
+    
+            status_code = 200
+            txt = ""
+            result = {}
+            
             if not firebase_admin._apps:
                 cred = credentials.Certificate("./lms-assignment-firebase-adminsdk-gg9hv-0e2b022f8b.json")
                 firebase_admin.initialize_app(cred, {
                     'databaseURL' : db_url
                 })
-                
+            
             ref = db.reference(userid)
-            if isNone(ref) == isNone:
+            if isNone(ref) == 'isNone':
                 # Crawling Method Parameter 
                 crawSystem = Pldd.crawling(userid, password, token)
                 try :
                     txt = crawSystem.craw()
-                    status_code = 200
                 except PE :
                     txt = 'Login Failed'
                     status_code = 400
@@ -66,10 +67,14 @@ class lmsItemViews(APIView):
             
             # JSON DB data processing
             firedb = firebaseLink.DBLink(userid)
-            firedb.rwJson("")
-            firedb.Link("")
+            firedb.rwJson()
+            firedb.Link()
+            
+            r = ref.child('task')
+            task_txt = r.get()
+            result['task'] = task_txt
             
             if status_code == 200:
-                return Response(txt, status = status.HTTP_200_OK)
+                return Response(result, status = status.HTTP_200_OK)
             else:
                 return Response({"data" : txt}, status = status.HTTP_400_BAD_REQUEST)
