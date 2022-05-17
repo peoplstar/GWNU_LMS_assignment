@@ -2,13 +2,18 @@
 __pycache__/
 *.py[cod]
 *$py.class
-*.json
+
 # C extensions
 *.so
 
-# firebase test python file
+# PEM
+*.PEM
 
-firebaseWindow.py
+# JSON
+*.json
+
+# testing
+test*
 
 # Distribution / packaging
 .Python
@@ -122,7 +127,6 @@ celerybeat.pid
 
 # SageMath parsed files
 *.sage.py
-test*.py
 
 # Environments
 .env
