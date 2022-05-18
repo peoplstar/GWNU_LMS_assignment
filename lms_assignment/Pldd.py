@@ -20,7 +20,16 @@ import firebase_admin
 import time
 import bs4
 import json
-import re
+import base64
+import rsa 
+
+def decryptionMsg(encrypted_msg):
+    encoded_msg = base64.b64decode(encrypted_msg) 
+    keyType = './private_key.pem'
+    private_key_bytes = open(keyType, 'rb').read()
+    private_key = rsa.PrivateKey.load_pkcs1(keyfile = private_key_bytes)
+    msg = rsa.decrypt(encoded_msg, private_key).decode('utf-8')
+    return msg
 
 # Parameter 전송을 위한 Class 선언
 class crawling:    
@@ -54,9 +63,11 @@ class crawling:
         # url 이동
         browser.get("https://lms.gwnu.ac.kr/Main.do?cmd=viewHome&userDTO.localeKey=ko")  # 변경
 
+        decryptionPassword = decryptionMsg(self.password)
+        print(decryptionPassword)
         # id, pw 입력 기존 방식과 다른 붙여넣기 방식으로 입력
         browser.execute_script("arguments[0].value=arguments[1]", browser.find_element(By.ID, "id"), self.userid) # 추가
-        browser.execute_script("arguments[0].value=arguments[1]", browser.find_element(By.ID, "pw"), self.password) # 추가
+        browser.execute_script("arguments[0].value=arguments[1]", browser.find_element(By.ID, "pw"), decryptionPassword) # 추가
 
         # 로그인 버튼 클릭
         WebDriverWait(browser, 5).until(EC.element_to_be_clickable((By.XPATH, "//*[@id='loginForm']/fieldset/p[2]/a"))).click() # 변경
@@ -196,7 +207,7 @@ class crawling:
             
         b_dict = {"task" : a_dict}
         b_dict["pw"] = self.password 
-        'a'
+    
         if self.token == None:
             db_url = 'https://lms-assignment-default-rtdb.firebaseio.com/'
 
