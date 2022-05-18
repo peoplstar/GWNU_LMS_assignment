@@ -13,11 +13,23 @@ from selenium.common.exceptions import UnexpectedAlertPresentException as PE # �
 from webdriver_manager.chrome import ChromeDriverManager
 from bs4 import BeautifulSoup as bs
 from xml.dom.minidom import Element
-
+from firebase_admin import credentials
+from firebase_admin import firestore
+from firebase_admin import db
+import firebase_admin
 import time
 import bs4
 import json
-import re
+import base64
+import rsa 
+
+def decryptionMsg(encrypted_msg):
+    encoded_msg = base64.b64decode(encrypted_msg) 
+    keyType = 'private.pem'
+    private_key_bytes = open(keyType, 'rb').read()
+    private_key = rsa.PrivateKey.load_pkcs1(keyfile=private_key_bytes)
+    msg = rsa.decrypt(encoded_msg, private_key).decode('utf-8')
+    return msg
 
 # Parameter 전송을 위한 Class 선언
 class crawling:    
@@ -51,9 +63,11 @@ class crawling:
         # url 이동
         browser.get("https://lms.gwnu.ac.kr/Main.do?cmd=viewHome&userDTO.localeKey=ko")  # 변경
 
+        decryptionPassword = decryptionMsg(self.password)
+        print(decryptionPassword)
         # id, pw 입력 기존 방식과 다른 붙여넣기 방식으로 입력
         browser.execute_script("arguments[0].value=arguments[1]", browser.find_element(By.ID, "id"), self.userid) # 추가
-        browser.execute_script("arguments[0].value=arguments[1]", browser.find_element(By.ID, "pw"), self.password) # 추가
+        browser.execute_script("arguments[0].value=arguments[1]", browser.find_element(By.ID, "pw"), decryptionPassword) # 추가
 
         # 로그인 버튼 클릭
         WebDriverWait(browser, 5).until(EC.element_to_be_clickable((By.XPATH, "//*[@id='loginForm']/fieldset/p[2]/a"))).click() # 변경
@@ -192,8 +206,21 @@ class crawling:
                 pass
             
         b_dict = {"task" : a_dict}
-        b_dict["pw"] = self.password        
-        b_dict["token"] = self.token
+        b_dict["pw"] = self.password 
+    
+        if self.token == None:
+            db_url = 'https://lms-assignment-default-rtdb.firebaseio.com/'
+
+            if not firebase_admin._apps:
+                cred = credentials.Certificate("./lms-assignment-firebase-adminsdk-gg9hv-0e2b022f8b.json")
+                firebase_admin.initialize_app(cred, {
+                    'databaseURL' : db_url
+                })
+                
+            self.token = db.reference(self.userid + '/token').get()
+            b_dict["token"] = self.token
+        else:
+            pass
         
         with open('./assignmentJson/'+ self.userid +'.json', 'w+', encoding = "UTF-8") as f : 
             json.dump(b_dict, f, ensure_ascii = False, default = str, indent = 4)
