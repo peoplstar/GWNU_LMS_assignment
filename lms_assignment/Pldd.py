@@ -13,7 +13,10 @@ from selenium.common.exceptions import UnexpectedAlertPresentException as PE # í
 from webdriver_manager.chrome import ChromeDriverManager
 from bs4 import BeautifulSoup as bs
 from xml.dom.minidom import Element
-
+from firebase_admin import credentials
+from firebase_admin import firestore
+from firebase_admin import db
+import firebase_admin
 import time
 import bs4
 import json
@@ -192,8 +195,21 @@ class crawling:
                 pass
             
         b_dict = {"task" : a_dict}
-        b_dict["pw"] = self.password        
-        b_dict["token"] = self.token
+        b_dict["pw"] = self.password 
+        'a'
+        if self.token == None:
+            db_url = 'https://lms-assignment-default-rtdb.firebaseio.com/'
+
+            if not firebase_admin._apps:
+                cred = credentials.Certificate("./lms-assignment-firebase-adminsdk-gg9hv-0e2b022f8b.json")
+                firebase_admin.initialize_app(cred, {
+                    'databaseURL' : db_url
+                })
+                
+            self.token = db.reference(self.userid + '/token').get()
+            b_dict["token"] = self.token
+        else:
+            pass
         
         with open('./assignmentJson/'+ self.userid +'.json', 'w+', encoding = "UTF-8") as f : 
             json.dump(b_dict, f, ensure_ascii = False, default = str, indent = 4)
