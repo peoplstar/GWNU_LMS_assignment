@@ -23,16 +23,17 @@ def isNone(r):
         return 'isNotNone'
     
 class lmsItemViews(APIView):
-    '''
-    def get(self, request, lms_id):
-        return(RSA 공개키를 전달)
-    '''
+    def get(self, request):
+        print("Hello")
+        # with open('./public.pem', 'r+', encoding = "UTF-8") as f: 
+        #     publicKey = f.read()
+        publicKey = "Key"
+        return Response(publicKey, status = status.HTTP_200_OK)
 
     def post(self, request):
         serializer = lmsItemSerializer(data = request.data)
         if serializer.is_valid():
             # serializer.save()
-
 
             inform = request.data
             dump = json.dumps(inform)
@@ -54,25 +55,24 @@ class lmsItemViews(APIView):
             
             ref = db.reference(userid)
             if isNone(ref) == 'isNone':
-                # Crawling Method Parameter 
+                # Crawling Method Parameter
                 crawSystem = Pldd.crawling(userid, password, token)
                 try :
-                    txt = crawSystem.craw()
+                    task_content = crawSystem.craw()
                 except PE :
                     txt = 'Login Failed'
                     status_code = 400
             else:
+                ref.update({'token' : token}) 
                 r = ref.child('task')
-                txt = r.get()
+                task_content = r.get()
             
             # JSON DB data processing
-            firedb = firebaseLink.DBLink(userid)
-            firedb.rwJson()
-            firedb.Link()
-            
-            r = ref.child('task')
-            task_txt = r.get()
-            result['task'] = task_txt
+            # firedb = firebaseLink.DBLink(userid)
+            # firedb.rwJson()
+            # firedb.Link()
+
+            result['task'] = task_content
             
             if status_code == 200:
                 return Response(result, status = status.HTTP_200_OK)

@@ -3,7 +3,7 @@ from .models import lmsItem
 
 class lmsItemSerializer(serializers.ModelSerializer):
     lms_id = serializers.CharField(max_length = 15)
-    lms_pw = serializers.CharField(max_length = 30)
+    lms_pw = serializers.CharField(max_length = 150)
 
     class Meta:
         model = lmsItem
