@@ -25,15 +25,9 @@ import rsa
 
 def decryptionMsg(encrypted_msg):
     encoded_msg = base64.b64decode(encrypted_msg) 
-<<<<<<< HEAD
     keyType = './private.pem'
     private_key_bytes = open(keyType, 'rb').read()
     private_key = rsa.PrivateKey.load_pkcs1(keyfile=private_key_bytes)
-=======
-    keyType = './private_key.pem'
-    private_key_bytes = open(keyType, 'rb').read()
-    private_key = rsa.PrivateKey.load_pkcs1(keyfile = private_key_bytes)
->>>>>>> bd60bdb231e1ef3cc28064fa179f70e3cef3d3af
     msg = rsa.decrypt(encoded_msg, private_key).decode('utf-8')
     return msg
 
