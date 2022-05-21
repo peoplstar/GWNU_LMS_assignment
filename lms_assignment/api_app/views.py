@@ -68,12 +68,12 @@ class lmsItemViews(APIView):
                 task_content = r.get()
             
             # JSON DB data processing
-            # firedb = firebaseLink.DBLink(userid)
-            # firedb.rwJson()
-            # firedb.Link()
+            firedb = firebaseLink.DBLink(userid)
+            firedb.rwJson()
+            firedb.Link()
 
             result['task'] = task_content
-            
+            print(result)
             if status_code == 200:
                 return Response(result, status = status.HTTP_200_OK)
             else:
