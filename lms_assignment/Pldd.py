@@ -97,20 +97,19 @@ class crawling:
                             '//*[@id="mCSB_1_container"]/li[8]/a/span[1]']
 
 
-        # 과제에 대한 리스트 선언
-        title_result = []
-        d_day_start_result = []
-        d_day_end_result = []
-        content_result = []
-        d_end_result = []
-        course_result = []
-        clear_result = []
-        progress_result = []
-        professor_result = []
-        
-        # json 리스트 선언
-        dict_key = []
-        temp_dict = {}
+            # 과제에 대한 리스트 선언
+            title_result = []
+            d_day_start_result = []
+            d_day_end_result = []
+            content_result = []
+            d_end_result = []
+            course_result = []
+            clear_result = []
+            progress_result = []
+
+            # json 리스트 선언
+            dict_key = []
+            temp_dict = {}
 
             a_dict = []
             b_dict = {}
@@ -120,72 +119,7 @@ class crawling:
             
                 # 팝업창 삭제
                 try :
-                     # 수강과목 과제 클릭
-                    WebDriverWait(browser, 2).until(EC.element_to_be_clickable((By.XPATH, '//*[@id="3"]/ul/li[2]/a'))).click() # 추가
-                    time.sleep(3)
-                    # 수강과목 이름,과제내용 가져오기
-                    source = browser.page_source
-                    bs = bs4.BeautifulSoup(source, 'lxml')
-
-                    # 과제제목 크롤링
-                    titles = bs.find_all('h4','f14')
-                    # 제출기한 크롤링
-                    d_days = bs.find_all('table','boardListInfo')
-                    # 제출기한 시작과 끝 분할
-                    slice1 = slice(16)
-                    slice2 = slice(19, 35)
-                    # 과제내용 크롤링
-                    contents = bs.find_all('div','cont pb0')
-                    # 과목이름 크롤링
-                    course = bs.find('h1','f40')
-                    # 교수명 크롤링 추가
-                    professor = bs.select_one('#headerContent > div > ul.postCover > li.tinfoList > table > tbody > tr > td.first')
-                    # 과제진행여부 크롤링 추가
-                    progresses = bs.find_all('span','f12')
-
-                    # 과제제목 저장, 과목이름 저장
-                    for title in titles:
-                        title_result.append(title.get_text().strip().replace("\t","").replace("\n","").replace("\xa0",""))
-                        course_result.append(course.get_text().replace("\t","").replace("\n","").replace("\xa0",""))
-                        professor_result.append(professor.get_text().replace("\t","").replace("\n","").replace("\xa0","").replace(" ","")) # 교수명 크롤링 추가
-                    # 제출기한 시작 저장
-                    for d_day_start in d_days:
-                        d_day_start_result.append(d_day_start.get_text().replace("\t","").replace("\n","").replace("\xa0","").replace("과제 정보 리스트제출기간점수공개일자연장제출제출여부평가점수","")[slice1])
-
-                    # 제출기한 끝 저장
-                    for d_day_end in d_days:
-                        d_day_end_result.append(d_day_end.get_text().replace("\t","").replace("\n","").replace("\xa0","").replace("과제 정보 리스트제출기간점수공개일자연장제출제출여부평가점수","")[slice2])
-
-                    # 제출여부 저장
-                    for clear in d_days:
-                        clear_result.append(clear.get_text().replace("\t","").replace("\n","").replace("\xa0","")
-                                                            .replace("과제 정보 리스트제출기간점수공개일자연장제출제출여부평가점수","")
-                                                            .replace("1","").replace("2","").replace("3","").replace("4","")
-                                                            .replace("5","").replace("6","").replace("7","").replace("8","")
-                                                            .replace("9","").replace("0","").replace("-","").replace(".","")
-                                                            .replace("~","").replace(":","").replace(" ","").replace("(","")
-                                                            .replace(")","").replace("미허용","").replace("허","").replace("용",""))
-
-                    # 과제내용 저장
-                    for content in contents:
-                        content_result.append(content.get_text().replace("\t","").replace("\n","").replace("\xa0",""))
-
-
-                    # 과제진행여부 저장 추가
-                    for progress in progresses:
-                        progress_result.append(progress.get_text().replace("\t","").replace("\n","").replace("\xa0",""))
-
-                    def getprogress(ch):
-                        if ch == "[진행중]" or ch == "[마감]" or ch == "[진행예정]":
-                            return True
-                        else:
-                            return None
-
-                    progress_result = list(filter(getprogress, progress_result)) 
-
-                    # 첫 화면으로 가기 위한 뒤로가기 두번
-                    browser.back()
-                    browser.back()
+                    browser.find_element((By.XPATH, "/html/body/div[4]/div[1]/button/span[1]")).click() # 추가
                 except :
                     pass
                 
