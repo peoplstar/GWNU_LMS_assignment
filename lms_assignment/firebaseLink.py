@@ -1,6 +1,7 @@
 # pip install firebase_admin
 
 import json
+from lib2to3.pgen2 import token
 import firebase_admin
 from firebase_admin import credentials
 from firebase_admin import firestore
@@ -11,9 +12,10 @@ from firebase_admin import db
 data = {}
 
 class DBLink:
-    def __init__(self, userid):
+    def __init__(self, userid, token):
         # 로그인
         self.userid = userid
+        self.token = token
         
     def rwJson(self):
         # 윈도우 경로 : r'lms_assignment/'
@@ -34,4 +36,15 @@ class DBLink:
         # 학번이 있는지 확인, 이후 db.reference('학번') 으로 JSON Response
         ref = db.reference('')
         ref.update({self.userid : data[self.userid]})
-        # ref.update({'token' : self.token})
+        
+    def TokenUpdate(self): 
+        db_url = 'https://lms-assignment-default-rtdb.firebaseio.com/'
+
+        if not firebase_admin._apps:
+            cred = credentials.Certificate("./lms-assignment-firebase-adminsdk-gg9hv-0e2b022f8b.json")
+            firebase_admin.initialize_app(cred, {
+                'databaseURL' : db_url
+            })
+            
+        ref = db.reference(self.userid)
+        ref.update({'token' : self.token})
