@@ -30,7 +30,8 @@ import rsa
 #     private_key = rsa.PrivateKey.load_pkcs1(keyfile = private_key_bytes)
 #     msg = rsa.decrypt(encoded_msg, private_key).decode('utf-8')
 #     return msg
-
+global browser 
+err_msg = "입력하신 아이디 혹은 비밀번호가 일치하지 않습니다."
 # Parameter 전송을 위한 Class 선언
 class crawling:    
     def __init__(self, userid, password, token = None):
@@ -39,7 +40,8 @@ class crawling:
         self.password = password
         self.token = token
         
-    def craw(self):
+    def login(self):
+        global browser
         chrome_options = webdriver.ChromeOptions()
 
         # 브라우저 창 없이 실행
@@ -68,7 +70,6 @@ class crawling:
 
         # 로그인 버튼 클릭
         WebDriverWait(browser, 3).until(EC.element_to_be_clickable((By.XPATH, "//*[@id='loginForm']/fieldset/p[2]/a"))).click() # 변경
-
         # 계정 정보가 일치하지 않을 시 예외처리 추가
         alert_result = ""
 
@@ -79,12 +80,16 @@ class crawling:
             alert.accept()
         except :
             pass
-
-        if alert_result == "입력하신 아이디 혹은 비밀번호가 일치하지 않습니다." :
+        return alert_result
+    
+    def craw(self):
+        global err_msg
+        # 계정정보가 동일하지 않을 시 파이썬 종료
+        if crawling.login(self) == err_msg:
             print("입력하신 아이디 혹은 비밀번호가 일치하지 않습니다.")
-            # 계정정보가 동일하지 않을 시 파이썬 종료
             browser.close()
             return "Login Failed"
+        
         else:
             # 현재 수강 과목 리스트로 저장 (최대 8개)
             subject_list = ['//*[@id="mCSB_1_container"]/li[1]/a/span[1]',
@@ -102,7 +107,6 @@ class crawling:
             d_day_start_result = []
             d_day_end_result = []
             content_result = []
-            d_end_result = []
             course_result = []
             clear_result = []
             progress_result = []
@@ -117,7 +121,6 @@ class crawling:
 
             # 과제 정보 가져오기
             for i in subject_list :
-            
                 # 팝업창 삭제
                 try :
                     browser.find_element((By.XPATH, "/html/body/div[4]/div[1]/button/span[1]")).click() # 추가
@@ -225,7 +228,7 @@ class crawling:
                 
             b_dict = {"task" : a_dict}
             b_dict["pw"] = self.password 
-        
+ 
             if self.token == None:
                 db_url = 'https://lms-assignment-default-rtdb.firebaseio.com/'
 
@@ -235,10 +238,10 @@ class crawling:
                         'databaseURL' : db_url
                     })
                     
-                self.token = db.reference(self.userid + '/token').get()
-                b_dict["token"] = self.token
+                DB_read_token = db.reference(self.userid + '/token').get()
+                b_dict["token"] = DB_read_token
             else:
-                pass
+                b_dict["token"] = self.token
             
             with open('./assignmentJson/'+ self.userid +'.json', 'w+', encoding = "UTF-8") as f : 
                 json.dump(b_dict, f, ensure_ascii = False, default = str, indent = 4)
