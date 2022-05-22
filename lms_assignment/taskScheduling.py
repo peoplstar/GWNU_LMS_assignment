@@ -78,7 +78,7 @@ class taskScheduling:
             if newTaskCnt != taskCnt:
                 token = db.reference(key + '/token').get()
                 push_fcm_notification.sendMessage("강릉원주대학교 과제", "새로운 과제가 등록 되었습니다.", token)
-                firedb = firebaseLink.DBLink(key)
+                firedb = firebaseLink.DBLink(key, token)
                 firedb.rwJson()
                 firedb.Link()
 

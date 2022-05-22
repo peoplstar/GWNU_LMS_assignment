@@ -22,11 +22,12 @@ def isNone(r):
     else:
         return 'isNotNone'
 
-def DataLink(userid):
+def DataLink(userid, token):
     # JSON DB data processing
-    firedb = firebaseLink.DBLink(userid)
+    firedb = firebaseLink.DBLink(userid, token)
     firedb.rwJson()
     firedb.Link()
+    firedb.TokenUpdate()
     
 class lmsItemViews(APIView):
     def get(self, request):
@@ -78,12 +79,12 @@ JvXbdmmjhXUDOcXlO0aQtpbhB5iFk9FfeyMyhpk20h1KzpEyrjLS1riVN/kBpQfs
                     msg = msg['task']
 
             else:
-                ref.update({'token' : token}) 
+                ref.update({'token' : token})
                 r = ref.child('task')
                 msg = r.get()
             
 
-            DataLink(userid)
+            DataLink(userid, token)
 
             result['task'] = msg
             # print(f'msg : {msg}')
