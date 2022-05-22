@@ -106,7 +106,8 @@ class crawling:
             course_result = []
             clear_result = []
             progress_result = []
-
+            professor_result = []
+            
             # json 리스트 선언
             dict_key = []
             temp_dict = {}
@@ -157,6 +158,8 @@ class crawling:
                         contents = bs.find_all('div','cont pb0')
                         # 과목이름 크롤링
                         course = bs.find('h1','f40')
+                        # 교수명 크롤링 추가
+                        professor = bs.select_one('#headerContent > div > ul.postCover > li.tinfoList > table > tbody > tr > td.first')
                         # 과제진행여부 크롤링 추가
                         progresses = bs.find_all('span','f12')
 
@@ -164,6 +167,7 @@ class crawling:
                         for title in titles:
                             title_result.append(title.get_text().strip().replace("\t","").replace("\n","").replace("\xa0",""))
                             course_result.append(course.get_text().replace("\t","").replace("\n","").replace("\xa0",""))
+                            professor_result.append(professor.get_text().replace("\t","").replace("\n","").replace("\xa0","").replace(" ","")) # 교수명 크롤링 추가
 
                         # 제출기한 시작 저장
                         for d_day_start in d_days:
@@ -214,7 +218,7 @@ class crawling:
                 dict_key.insert(j, 'tasks%d' %j)
                 if progress_result[j] == "[진행중]" or progress_result[j] == "[진행예정]":
                     for i in range(len(dict_key)):
-                        temp_dict = {"course" : course_result[i], "title" : title_result[i], "d_day_start" : d_day_start_result[i], "d_day_end" : d_day_end_result[i], "clear" : clear_result[i], "content" : content_result[i]}
+                        temp_dict = {"course" : course_result[i], "professor" : professor_result[i], "title" : title_result[i], "d_day_start" : d_day_start_result[i], "d_day_end" : d_day_end_result[i], "clear" : clear_result[i], "content" : content_result[i]}
                     a_dict.append(temp_dict)
                 else:
                     pass
