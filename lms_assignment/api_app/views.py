@@ -21,6 +21,12 @@ def isNone(r):
         return 'isNone'
     else:
         return 'isNotNone'
+
+def DataLink(userid):
+    # JSON DB data processing
+    firedb = firebaseLink.DBLink(userid)
+    firedb.rwJson()
+    firedb.Link()
     
 class lmsItemViews(APIView):
     def get(self, request):
@@ -43,7 +49,6 @@ class lmsItemViews(APIView):
             token = tmp['token']
             db_url = 'https://lms-assignment-default-rtdb.firebaseio.com/'
     
-            status_code = 200
             txt = ""
             result = {}
             
@@ -57,24 +62,19 @@ class lmsItemViews(APIView):
             if isNone(ref) == 'isNone':
                 # Crawling Method Parameter
                 crawSystem = Pldd.crawling(userid, password, token)
-                try :
-                    task_content = crawSystem.craw()
-                except PE :
+                task_content = crawSystem.craw()
+            
+                if task_content == 'Login Failed':
                     txt = 'Login Failed'
-                    status_code = 400
+                    return Response({"data" : txt}, status = status.HTTP_400_BAD_REQUEST)
             else:
                 ref.update({'token' : token}) 
                 r = ref.child('task')
                 task_content = r.get()
             
-            # JSON DB data processing
-            # firedb = firebaseLink.DBLink(userid)
-            # firedb.rwJson()
-            # firedb.Link()
+            DataLink(userid)
 
             result['task'] = task_content
-            
-            if status_code == 200:
-                return Response(result, status = status.HTTP_200_OK)
-            else:
-                return Response({"data" : txt}, status = status.HTTP_400_BAD_REQUEST)
+    
+            return Response(result, status = status.HTTP_200_OK)
+
