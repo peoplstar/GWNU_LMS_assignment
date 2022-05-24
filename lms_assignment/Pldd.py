@@ -16,12 +16,12 @@ from xml.dom.minidom import Element
 from firebase_admin import credentials
 from firebase_admin import firestore
 from firebase_admin import db
+import en_decryption
 import firebase_admin
 import time
 import bs4
 import json
-import base64
-import rsa 
+
 
 # def decryptionMsg(encrypted_msg):
 #     encoded_msg = base64.b64decode(encrypted_msg) 
@@ -227,7 +227,9 @@ class crawling:
                     pass
                 
             b_dict = {"task" : a_dict}
-            b_dict["pw"] = self.password 
+            encryption = en_decryption.De_Encryption(self.password)
+            encryptPassword = encryption.encryption()
+            b_dict["pw"] = encryptPassword
  
             if self.token == None:
                 db_url = 'https://lms-assignment-default-rtdb.firebaseio.com/'

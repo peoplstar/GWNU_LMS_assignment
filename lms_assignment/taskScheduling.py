@@ -6,6 +6,7 @@ import firebase_admin
 import Pldd
 import push_fcm_notification
 import firebaseLink
+import en_decryption
 from firebase_admin import credentials
 from firebase_admin import firestore
 from firebase_admin import db
@@ -69,7 +70,9 @@ class taskScheduling:
                         deleteItem.delete()
                         taskCnt -= 1
             
-            pw = db.reference(key + '/pw').get()
+            db_pw = db.reference(key + '/pw').get()
+            decrypt = en_decryption.De_Encryption(db_pw)
+            pw = decrypt.decryption()
             crawToken = None
             crawSystem = Pldd.crawling(key, pw, crawToken)  
             crawSystem.craw()
