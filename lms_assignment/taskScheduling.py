@@ -75,8 +75,13 @@ class taskScheduling:
             pw = decrypt.decryption()
             crawToken = None
             crawSystem = Pldd.crawling(key, pw, crawToken)  
-            crawSystem.craw()
-            newTaskCnt = newTaskCrawlingCnt(key)
+            msg = crawSystem.login()
+            
+            if msg != "":
+                continue
+            else:
+                crawSystem.craw()
+                newTaskCnt = newTaskCrawlingCnt(key)
             
             if newTaskCnt != taskCnt:
                 token = db.reference(key + '/token').get()
