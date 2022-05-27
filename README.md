@@ -67,13 +67,22 @@ Settings.py의 경로는 `[projectname]/[projectname]/settings.py` 에서 확인
 <img src=https://user-images.githubusercontent.com/78135526/164878910-929d5d98-77d2-453b-9ced-e0ce22ca4cf1.png width = '250' height = '250'>
 
 
-Default는 `ALLOWED_HOSTS = []`로 되어 있다. 이렇게 되면 외부에서 접근이 불가능하다. 해당 서버에 모두가 접근 할 수 있게 위와 같이 **'*'** 로 설정하고, 추후 AWS 인바운드 정책 및 iptables로 보안을 설정 할 것이다.
+* Default는 `ALLOWED_HOSTS = []`로 되어 있다. 이렇게 되면 외부에서 접근이 불가능하다. 해당 서버에 모두가 접근 할 수 있게 위와 같이 **'*'** 로 설정하고, 추후 AWS 인바운드 정책 및 iptables로 보안을 설정 할 것이다.
 
-INSTALLED_APPS는 REST API를 사용하기 위해 `rest_framework` 명시, 우리가 사용할 앱 `api_app`을 명시해준다.
+* INSTALLED_APPS는 REST API를 사용하기 위해 `rest_framework` 명시, 우리가 사용할 앱 `api_app`을 명시해준다.
+
+* [추가] HTTPS를 사용하기 위해 `sslserver`도 추가한다.
 
 > ### Views.py 파일 수정
 
 ```python
+def DataLink(userid, token):
+    # JSON DB data processing
+    firedb = firebaseLink.DBLink(userid, token)
+    firedb.rwJson()
+    firedb.Link()
+    firedb.TokenUpdate()
+
  def post(self, request):
         serializer = lmsItemSerializer(data = request.data)
         if serializer.is_valid():
@@ -99,7 +108,7 @@ INSTALLED_APPS는 REST API를 사용하기 위해 `rest_framework` 명시, 우�
 ```
 * ID와 PW는 평문으로 API Server에 저장된다면 보안상 매우 취약하게 되므로, `serializer.save()`를 주석 처리하여 저장되지 않게 명시한다. 
 
-  * ##### *추후 https를 이용해 보완*   
+* Token값이 변경 될 수 있으므로, 토큰에 대한 업데이트를 수시로 해야한다.
 
 * PUSH 알림을 위한 FCM Token값을 위해 `token = tmp['token']`을 추가
 
@@ -227,3 +236,59 @@ def access():
 
 > ### push_fcm_notification.py
 * taskScheduling.py로 스케쥴링 시 PUSH 알림을 위한 코드 작성
+
+> ### 암호화
+* 데이터베이스에 사용자 패스워드가 평문으로 저장되는 경우는 있을 수 없는 일이다. 따라서 암호화를 진행해야한다.
+
+```python
+def load_key():
+    """
+    Load the previously generated key
+    """
+    return open('./key.pem', 'rb').read()
+
+class De_Encryption():
+    def __init__(self, msg):
+        self.msg = msg
+        self.key = load_key()
+        
+    def encryption(self):
+        
+        cipher_suite = fn(self.key)
+
+        cipher_text = cipher_suite.encrypt(self.msg.encode())
+        
+        return cipher_text
+        
+    def decryption(self):
+        self.msg = self.msg.encode()
+        cipher_suite = fn(self.key)
+        
+        print(self.msg)
+        
+        plain_text = cipher_suite.decrypt(self.msg).decode()            
+        
+        return plain_text
+```
+
+* 암호화, 복호화를 사용할 때 해당 메세지를 받아오고 필요에 따른 함수를 불러와서 사용 할 것이다.
+
+* `from cryptography.fernet import Fernet as fn` 로 Python 암호화 라이브러리 `Fernet`을 이용한다.
+
+* 위 모듈을 사용하기 이전에 `key = fn.generate_key()` 해당 값으로 키를 발급 받는다
+```python3
+ with open('./key.pem', 'wb') as f: f.write(key)
+```
+* 일회용이 아니기에 위 코드로 Binary를 저장할 파일을 생성하여 Load하여 사용할 것이다.
+
+> ### HTTPS
+
+* 서버를 실행할 환경에서 HTTPS 인증을 위한 Key 파일을 생성한다.
+
+* `pip3 install django-sslserver` : 설치
+
+* `openssl genrsa 2048 > django.key` : 생성
+
+* Ubuntu에서 1024비트 이하의 인증은 보안에 취약하다고 1024로 생성할 경우 sslrunserver 에러가 발생할 수 있으니 유의해야한다.
+
+* `openssl req -new -x509 -nodes -sha256 -days 365 -key django.key > django.crt`로 공개 키를 생성한다.
