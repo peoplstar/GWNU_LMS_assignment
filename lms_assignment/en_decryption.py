@@ -4,27 +4,35 @@ from cryptography.fernet import Fernet as fn
 
 # with open('./key.pem', 'wb') as f:
 #     f.write(key)
+def load_key():
+    """
+    Load the previously generated key
+    """
+    return open('./key.pem', 'rb').read()
+
 class De_Encryption():
     def __init__(self, msg):
         self.msg = msg
-    
+        self.key = load_key()
+        
     def encryption(self):
-        with open('./key.pem', 'rb') as f:
-            key = f.read()
-        cipher_suite = fn(key)
+        
+        cipher_suite = fn(self.key)
 
         cipher_text = cipher_suite.encrypt(self.msg.encode())
         
         return cipher_text
         
     def decryption(self):
-        with open('./key.pem', 'rb') as f:
-            key = f.read()
-        cipher_suite = fn(key)
-
-        plain_text = cipher_suite.decrypt(self.msg).decode() 
+        self.msg = self.msg.encode()
+        cipher_suite = fn(self.key)
+        
+        print(self.msg)
+        
+        plain_text = cipher_suite.decrypt(self.msg).decode()            
         
         return plain_text
+
 
 # if __name__ == '__main__': # TEST
 #     msg = '11'
