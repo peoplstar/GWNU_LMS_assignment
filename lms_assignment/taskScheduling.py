@@ -71,6 +71,8 @@ class taskScheduling:
                         taskCnt -= 1
             
             db_pw = db.reference(key + '/pw').get()
+            db_pw = db_pw[2:len(db_pw)-1]
+            db_pw = db_pw.encode()
             decrypt = en_decryption.De_Encryption(db_pw)
             pw = decrypt.decryption()
             crawToken = None

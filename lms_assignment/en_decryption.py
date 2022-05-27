@@ -14,8 +14,6 @@ class De_Encryption():
         cipher_suite = fn(key)
 
         cipher_text = cipher_suite.encrypt(self.msg.encode())
-
-        print(f'encrypt_text : {cipher_text}')
         
         return cipher_text
         
@@ -25,8 +23,6 @@ class De_Encryption():
         cipher_suite = fn(key)
 
         plain_text = cipher_suite.decrypt(self.msg).decode() 
-
-        print(f'decrypt_text : {plain_text}')
         
         return plain_text
 
