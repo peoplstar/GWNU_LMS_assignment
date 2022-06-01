@@ -22,14 +22,6 @@ import time
 import bs4
 import json
 
-
-# def decryptionMsg(encrypted_msg):
-#     encoded_msg = base64.b64decode(encrypted_msg) 
-#     keyType = './private_key.pem'
-#     private_key_bytes = open(keyType, 'rb').read()
-#     private_key = rsa.PrivateKey.load_pkcs1(keyfile = private_key_bytes)
-#     msg = rsa.decrypt(encoded_msg, private_key).decode('utf-8')
-#     return msg
 global browser 
 err_msg = "입력하신 아이디 혹은 비밀번호가 일치하지 않습니다."
 # Parameter 전송을 위한 Class 선언
@@ -47,14 +39,12 @@ class crawling:
         # 브라우저 창 없이 실행
         chrome_options.add_argument("--headless")
         chrome_options.add_argument("--window-size=1920,1080")
-        chrome_options.add_argument("--disable-gpu")  # 추가
-        chrome_options.add_argument("--disable-infobars") # 추가
-        chrome_options.add_argument("--disable-extensions") # 추가
-        chrome_options.add_argument("--disable-popup-blocking") # 추가
+        chrome_options.add_argument("--disable-gpu") 
         # 오류제어 추가
         chrome_options.add_argument("--no-sandbox")  # 대부분의 리소스에 대한 액세스를 방지 추가
         chrome_options.add_argument("--disable-setuid-sandbox") # 크롬 충돌을 막아줌 추가 
         chrome_options.add_argument("--disable-dev-shm-usage") # 메모리가 부족해서 에러가 발생하는 것을 막아줌 추가
+
         
         # Chromedriver 경로 설정
         browser = webdriver.Chrome(service = Service(ChromeDriverManager().install()), options = chrome_options) # 추가
@@ -111,6 +101,7 @@ class crawling:
             clear_result = []
             progress_result = []
             professor_result = []
+            extend_result = []
             
             # json 리스트 선언
             dict_key = []
@@ -131,7 +122,7 @@ class crawling:
                 try :
                     searching = browser.find_element(By.XPATH, i)
                 except :
-                    print("모든 과제를 불러왔습니다.")
+                    print(f'{self.userid} : 모든 과제를 불러왔습니다.')
                     break
                 
                 # 수강과목 클릭
@@ -145,7 +136,7 @@ class crawling:
                     try :
                         # 수강과목 과제 클릭
                         WebDriverWait(browser, 2).until(EC.element_to_be_clickable((By.XPATH, '//*[@id="3"]/ul/li[2]/a'))).click() # 추가
-                        time.sleep(3)
+                        
                         # 수강과목 이름,과제내용 가져오기
                         source = browser.page_source
                         bs = bs4.BeautifulSoup(source, 'lxml')
@@ -165,7 +156,8 @@ class crawling:
                         professor = bs.select_one('#headerContent > div > ul.postCover > li.tinfoList > table > tbody > tr > td.first')
                         # 과제진행여부 크롤링 추가
                         progresses = bs.find_all('span','f12')
-
+                        # 연장제출기간 추가
+                        extends = bs.select('table.boardListInfo > tbody > tr > td:nth-child(3)')
                         # 과제제목 저장, 과목이름 저장
                         for title in titles:
                             title_result.append(title.get_text().strip().replace("\t","").replace("\n","").replace("\xa0",""))
@@ -200,13 +192,16 @@ class crawling:
                             progress_result.append(progress.get_text().replace("\t","").replace("\n","").replace("\xa0",""))
 
                         def getprogress(ch):
-                            if ch == "[진행중]" or ch == "[마감]" or ch == "[진행예정]":
+                            if ch == "[진행중]" or ch == "[마감]" or ch == "[진행예정]" or ch == "[연장제출기간]":
                                 return True
                             else:
                                 return None
 
                         progress_result = list(filter(getprogress, progress_result)) 
 
+                        # 연장제출기간 추가
+                        for extend in extends:
+                            extend_result.append(extend.get_text().replace("\t","").replace("\n","").replace("\xa0","").replace("허 용","").replace("미허용","").replace("(","").replace(")","").lstrip())
                         # 첫 화면으로 가기 위한 뒤로가기 두번
                         browser.back()
                         browser.back()
@@ -222,6 +217,10 @@ class crawling:
                 if progress_result[j] == "[진행중]" or progress_result[j] == "[진행예정]":
                     for i in range(len(dict_key)):
                         temp_dict = {"course" : course_result[i], "professor" : professor_result[i], "title" : title_result[i], "d_day_start" : d_day_start_result[i], "d_day_end" : d_day_end_result[i], "clear" : clear_result[i], "content" : content_result[i]}
+                    a_dict.append(temp_dict)
+                elif progress_result[j] == "[연장제출기간]" :   # 추가  
+                    for i in range(len(dict_key)):
+                        temp_dict = {"course" : course_result[i], "professor" : professor_result[i], "title" : title_result[i], "d_day_start" : d_day_start_result[i], "d_day_end" : extend_result[i], "clear" : clear_result[i], "content" : content_result[i]}
                     a_dict.append(temp_dict)
                 else:
                     pass
