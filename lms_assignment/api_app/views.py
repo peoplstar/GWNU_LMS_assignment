@@ -3,10 +3,8 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from .serializers import lmsItemSerializer
-from .models import lmsItem
 from selenium.common.exceptions import UnexpectedAlertPresentException as PE # 로그인 오류
 from firebase_admin import credentials
-from firebase_admin import firestore
 from firebase_admin import db
 import Pldd
 import json
@@ -57,24 +55,22 @@ class lmsItemViews(APIView):
                 })
             
             ref = db.reference(userid)
+            crawSystem = Pldd.crawling(userid, password, token)
+            msg = crawSystem.login()
             
-            if isNone(ref) == 'isNone':
-                # Crawling Method Parameter
-                crawSystem = Pldd.crawling(userid, password, token)
-                msg = crawSystem.login()
-                if msg != "":
-                    txt = 'Login Failed'
-                    return Response({"data" : txt}, status = status.HTTP_400_BAD_REQUEST)
-                else:
-                    msg = crawSystem.craw()
-                    msg = msg['task']
-
+            if msg != "":
+                txt = 'Login Failed'
+                return Response({"data" : txt}, status = status.HTTP_400_BAD_REQUEST)
+             
+            elif isNone(ref) == 'isNone':
+                msg = crawSystem.craw()
+                msg = msg['task']
+            
             else:
                 ref.update({'token' : token})
                 r = ref.child('task')
                 msg = r.get()
-            
-
+             
             DataLink(userid, token)
 
             result['task'] = msg
