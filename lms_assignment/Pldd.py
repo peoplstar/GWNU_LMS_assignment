@@ -7,18 +7,12 @@ from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from selenium.common.exceptions import NoSuchElementException # 예외지정
 from selenium.webdriver.chrome.service import Service
-from selenium.common.exceptions import UnexpectedAlertPresentException as PE # 팝업 예외 지정
 from webdriver_manager.chrome import ChromeDriverManager
-from bs4 import BeautifulSoup as bs
-from xml.dom.minidom import Element
 from firebase_admin import credentials
-from firebase_admin import firestore
 from firebase_admin import db
 import en_decryption
 import firebase_admin
-import time
 import bs4
 import json
 

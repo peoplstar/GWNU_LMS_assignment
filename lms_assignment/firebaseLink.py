@@ -1,10 +1,8 @@
 # pip install firebase_admin
 
 import json
-from lib2to3.pgen2 import token
 import firebase_admin
 from firebase_admin import credentials
-from firebase_admin import firestore
 from firebase_admin import db
 
 # Firebase database 인증 및 앱 초기화
