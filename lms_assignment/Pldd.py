@@ -25,7 +25,10 @@ class crawling:
         self.userid = userid
         self.password = password
         self.token = token
-        
+    
+    def __del__(self):
+        browser.quit()
+
     def login(self):
         global browser
         chrome_options = webdriver.ChromeOptions()
@@ -49,11 +52,14 @@ class crawling:
         # decryptionPassword = decryptionMsg(self.password)
         # print(decryptionPassword)
         # id, pw 입력 기존 방식과 다른 붙여넣기 방식으로 입력
-        browser.execute_script("arguments[0].value=arguments[1]", browser.find_element(By.ID, "id"), self.userid) # 추가
-        browser.execute_script("arguments[0].value=arguments[1]", browser.find_element(By.ID, "pw"), self.password) # 추가
+        browser.execute_script("arguments[0].value=arguments[1]",
+                        browser.find_element(By.ID, "id"), self.userid) # 추가
+        browser.execute_script("arguments[0].value=arguments[1]",
+                        browser.find_element(By.ID, "pw"), self.password) # 추가
 
         # 로그인 버튼 클릭
-        WebDriverWait(browser, 3).until(EC.element_to_be_clickable((By.XPATH, "//*[@id='loginForm']/fieldset/p[2]/a"))).click() # 변경
+        WebDriverWait(browser, 3).until(EC.element_to_be_clickable(
+            (By.XPATH, "//*[@id='loginForm']/fieldset/p[2]/a"))).click() # 변경
         # 계정 정보가 일치하지 않을 시 예외처리 추가
         alert_result = ""
 
@@ -108,7 +114,7 @@ class crawling:
             for i in subject_list :
                 # 팝업창 삭제
                 try :
-                    browser.find_element((By.XPATH, "/html/body/div[4]/div[1]/button/span[1]")).click() # 추가
+                    WebDriverWait(browser, 0.2).until(EC.element_to_be_clickable((By.XPATH, '/html/body/div[4]/div[1]/button/span[1]'))).click() # 추가
                 except :
                     pass
                 
